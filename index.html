@@ -1,160 +1,48 @@
+
 <!DOCTYPE html>
 <html lang="cs">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Velaris - Úvodní stránka</title>
-  <style>
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: #0a0a14;
-      color: #c8c8d0;
-      margin: 0;
-      padding: 20px;
-    }
-    header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-bottom: 1px solid #333;
-      padding-bottom: 10px;
-    }
-    .logo {
-      font-weight: bold;
-      font-size: 1.5em;
-      cursor: pointer;
-      color: #61dafb;
-    }
-    .date {
-      font-size: 1em;
-      color: #888;
-    }
-    nav.top-nav {
-      margin: 15px 0;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-bottom: 1px solid #333;
-      padding-bottom: 10px;
-    }
-    .location {
-      font-weight: 600;
-      font-size: 1.2em;
-    }
-    .map {
-      cursor: pointer;
-      color: #61dafb;
-      user-select: none;
-    }
-    nav.main-nav {
-      display: flex;
-      gap: 15px;
-      border-bottom: 1px solid #333;
-      padding-bottom: 10px;
-    }
-    nav.main-nav button {
-      background: none;
-      border: none;
-      color: #61dafb;
-      font-weight: 600;
-      font-size: 1em;
-      cursor: pointer;
-      padding: 5px 10px;
-      transition: background-color 0.3s;
-    }
-    nav.main-nav button:hover,
-    nav.main-nav button.active {
-      background-color: #1f1f36;
-      border-radius: 5px;
-    }
-    section.content {
-      padding: 20px 0;
-      min-height: 300px;
-      font-size: 1.1em;
-      line-height: 1.5em;
-      background-color: #12122a;
-      border-radius: 8px;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Velaris - Hlavní stránka</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
-  <header>
-    <div class="logo" onclick="location.reload()">Velaris</div>
-    <div class="date" id="starTime">Star Time: 3025.07.07</div>
-    <div class="profile">👤 Roman</div>
-  </header>
-
-  <nav class="top-nav">
-    <div class="location">Runalis – Planetární Capitol</div>
-    <div class="map" title="Zobrazit mapu">🗺️ Mapa</div>
-  </nav>
-
-  <nav class="main-nav" id="mainNav">
-    <button class="active" data-section="base">Base</button>
-    <button data-section="vehicles">Vehicles</button>
-    <button data-section="technologies">Technologies</button>
-    <button data-section="lokalita">Lokalita</button>
-    <button data-section="zone">Zone</button>
-  </nav>
-
-  <section class="content" id="contentArea">
-    <h2>Vítej v základu Velaris</h2>
-    <p>Zde najdeš základní informace a stav tvé základny.</p>
-  </section>
-
-  <script>
-    const navButtons = document.querySelectorAll('#mainNav button');
-    const contentArea = document.getElementById('contentArea');
-
-    navButtons.forEach(btn => {
-      btn.addEventListener('click', () => {
-        navButtons.forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        const section = btn.dataset.section;
-
-        // Změna obsahu podle sekce
-        switch(section) {
-          case 'base':
-            contentArea.innerHTML = `
-              <h2>Base Dashboard</h2>
-              <p>📦 Sklady: Massite 70k | Ore 30k | Konstrukční materiál 20k</p>
-              <p>⚙️ Rafinérka: Aktivní (ukončení 7-7-2525 13:25)</p>
-              <p>🧪 Fabrikátor: Čeká na pokyn</p>
-              <p>🔧 Zařízení: 3 v údržbě</p>
-            `;
-            break;
-          case 'vehicles':
-            contentArea.innerHTML = `
-              <h2>Vehicles</h2>
-              <p>🚙 Minibike: Připraven k expedici</p>
-              <p>🚜 Harvestor: Nedostupný</p>
-            `;
-            break;
-          case 'technologies':
-            contentArea.innerHTML = `
-              <h2>Technologies</h2>
-              <p>Zde bude seznam výzkumů a technologií.</p>
-            `;
-            break;
-          case 'lokalita':
-            contentArea.innerHTML = `
-              <h2>Lokalita</h2>
-              <p>Informace o aktuální lokaci.</p>
-            `;
-            break;
-          case 'zone':
-            contentArea.innerHTML = `
-              <h2>Zone</h2>
-              <p>Přehled zón a aliancí.</p>
-            `;
-            break;
-          default:
-            contentArea.innerHTML = '<p>Vyber sekci.</p>';
-        }
-      });
-    });
-  </script>
-
+    <header>
+        <div class="top-bar">
+            <span class="logo" onclick="location.reload()">VELARIS</span>
+            <span class="datetime">Star Time: 3025.07.07</span>
+            <span class="profile"><a href="#">🧍 Profil</a></span>
+        </div>
+        <div class="location-bar">
+            <span class="location">Pozice: Runalis – Nemoris základna</span>
+            <span class="map"><a href="#">🗺️ Mapa</a></span>
+        </div>
+        <nav class="main-nav">
+            <button onclick="showSection('base')">Base</button>
+            <button onclick="showSection('vehicles')">Vehicles</button>
+            <button onclick="showSection('technologies')">Technologies</button>
+            <button onclick="showSection('location')">Lokalita</button>
+        </nav>
+    </header>
+    <main id="content">
+        <section id="dashboard">
+            <h1>DASHBOARD BASE</h1>
+            <p>📦 Sklady: MASSIT 70k | ORE 30k</p>
+            <p>⚙️ Rafinérka: Aktivní (zpracovává 1200 ORE)</p>
+            <p>🧪 Fabrikátor: Neaktivní – čeká na plán</p>
+            <p>🔧 Zařízení 3: V údržbě</p>
+            <p>🚙 Vozidla: Minibike připraven, Harvestor nedostupný</p>
+            <p>📄 Poznámka AI: „Zdá se, že produkce stagnuje…“</p>
+        </section>
+    </main>
+    <footer>
+        <p>&copy; 3025 Velaris Initiative</p>
+    </footer>
+<script>
+function showSection(id) {
+    document.getElementById('content').innerHTML = '<p>Vybral jsi sekci: ' + id + '</p>';
+}
+</script>
 </body>
 </html>

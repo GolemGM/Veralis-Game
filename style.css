@@ -21,14 +21,13 @@ header {
     font-weight: bold;
     cursor: pointer;
 }
+.main-nav {
+    justify-content: flex-start !important;
+    gap: 10px;
+}
+
 .main-nav button {
-    margin: 0 0.5rem;
-    padding: 0.5rem 1rem;
-    background-color: #292933;
-    color: #e0e0e0;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
+    flex: 0 0 auto;
 }
 main {
     padding: 2rem;

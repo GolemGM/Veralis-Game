@@ -47,5 +47,35 @@ function showSection(id) {
     <script>
   document.getElementById('year').textContent = new Date().getFullYear();
 </script>
+<script>
+  const correctPassword = "testerlama";
+
+  const passwordScreen = document.getElementById('password-screen');
+  const passwordInput = document.getElementById('password-input');
+  const passwordSubmit = document.getElementById('password-submit');
+  const passwordError = document.getElementById('password-error');
+
+  passwordSubmit.addEventListener('click', () => {
+    if(passwordInput.value === correctPassword) {
+      passwordScreen.style.display = 'none'; 
+    } else {
+      passwordError.style.visibility = 'visible';
+      passwordInput.value = '';
+    }
+  });
+
+  // Podpora Enter klávesy
+  passwordInput.addEventListener('keyup', (e) => {
+    if(e.key === 'Enter') {
+      passwordSubmit.click();
+    }
+  });
+</script>
 </body>
+    <div id="password-screen" style="position:fixed;top:0;left:0;width:100vw;height:100vh;background:#0e0e12;display:flex;flex-direction:column;justify-content:center;align-items:center;z-index:9999;">
+  <label for="password-input" style="color:#e0e0e0;font-size:1.2rem;margin-bottom:0.5rem;">Zadej přístupové heslo:</label>
+  <input type="password" id="password-input" style="padding:0.5rem;font-size:1rem;"/>
+  <button id="password-submit" style="margin-top:1rem;padding:0.5rem 1rem;cursor:pointer;">Odeslat</button>
+  <p id="password-error" style="color:#ff4444;margin-top:1rem;visibility:hidden;">Špatné heslo, zkus to znovu.</p>
+</div>
 </html>

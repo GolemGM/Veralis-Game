@@ -7,9 +7,9 @@
 
 body, html {
   height: 100%;
-  background: url("images/backgroundstar.png") no-repeat center center fixed;
-  background-size: cover;
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  background: url("images/starbridge-background.png") no-repeat center center fixed;
+  background-size: cover;
   color: #ddd;
   overflow-x: hidden;
 }
@@ -89,13 +89,15 @@ body, html {
 }
 
 /* === Layout === */
-.main-columns,
 .content-wrapper {
   display: flex;
   flex: 1;
   gap: 20px;
-  padding: 30px 40px;
+  padding: 30px 0;
   justify-content: center;
+  max-width: 1080px;
+  margin: 0 auto;
+  width: 100%;
 }
 
 .panel,

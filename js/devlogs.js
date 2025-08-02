@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
-  fetch("https://veralis-backend-production.up.railway.app/api/devlog")
+  fetch("https://veralis-backend-production.up.railway.app/api/devlogs")
     .then(res => res.json())
     .then(devlogs => {
       const lang = localStorage.getItem("lang") || "cs";

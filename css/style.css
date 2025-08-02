@@ -8,7 +8,7 @@
 body, html {
   height: 100%;
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-  background: url("images/starbridge-background.png") no-repeat center center fixed;
+  background: url("images/backgroundstar.png") no-repeat center center fixed;
   background-size: cover;
   color: #ddd;
   overflow-x: hidden;

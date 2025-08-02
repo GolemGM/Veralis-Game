@@ -163,3 +163,13 @@ footer {
   padding-left: 12px;
 }
 
+.event-msg a {
+  color: #9eb5d6;           /* decentní světlá modrá */
+  text-decoration: none;   /* bez podtržení */
+  font-weight: 500;
+}
+
+.event-msg a:hover {
+  color: #dbe9ff;           /* zesvětlený hover */
+  text-decoration: underline; /* volitelně jen při najetí */
+}

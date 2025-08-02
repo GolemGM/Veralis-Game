@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Veralis – StarBridge reporter</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script defer src="js/auth.js"></script>
+  <script defer src="js/logout.js"></script>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="logo">Veralis</div>
+      <button class="logout-btn" onclick="logout()" title="Logout">🚪↩️</button>
+    </header>
+
+    <main>
+      <button class="enter-btn">🚀 Enter the Game</button>
+
+      <div class="main-columns">
+        <section class="devlogs">
+          <h2>🛠️ Patch Notes & Dev Logs</h2>
+          <!-- log entries will go here -->
+          <div class="log-entry">⏱️ [01.08] First launch – <a href="#">Discord</a></div>
+          <div class="log-entry">⏱️ [30.07] UI structure built – <a href="#">Discord</a></div>
+        </section>
+
+        <div class="placeholder">
+          <!-- Placeholder for graphic (pipe, cable...) -->
+        </div>
+
+        <section class="events">
+          <h2>📡 Star News Reporter</h2>
+          <!-- event entries will go here -->
+          <div class="event-entry">🕒 18:25 – Orbital scanner online</div>
+          <div class="event-entry">🕒 17:10 – Resource surge detected</div>
+        </section>
+      </div>
+    </main>
+
+    <footer>
+      © Veralis Project 2025
+    </footer>
+  </div>
+</body>
+</html>

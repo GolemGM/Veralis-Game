@@ -40,5 +40,19 @@
 
     <footer data-i18n="footer"></footer>
   </div>
+  
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    document.querySelector(".enter-btn").addEventListener("click", () => {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        window.location.href = "https://golemgm.github.io/Veralis-Promo/login.html?status=tokenfail";
+      } else {
+        window.location.href = "demogame.html"; // později nahradíš mainGame.html
+      }
+    });
+  });
+</script>
+  
 </body>
 </html>

@@ -1,33 +1,38 @@
-document.addEventListener("DOMContentLoaded", () => {
-  fetch("https://veralis-backend-production.up.railway.app/api/devlogs")
-    .then(res => res.json())
-    .then(devlogs => {
-      const lang = localStorage.getItem("lang") || "cs";
-      const tbody = document.querySelector("#devlog-table tbody");
-      tbody.innerHTML = "";
+document.addEventListener("DOMContentLoaded", async () => {
+  const container = document.getElementById("devlog-list");
+  if (!container) return;
 
-      devlogs.forEach(log => {
-        const tr = document.createElement("tr");
+  try {
+    const res = await fetch("https://veralis-backend-production.up.railway.app/api/devlogs");
+    const data = await res.json();
 
-        // sloupec s datem
-        const dateTd = document.createElement("td");
-        const date = new Date(log.date).toLocaleDateString();
-        dateTd.textContent = date;
+    container.innerHTML = "";
 
-        // sloupec s textem
-        const logTd = document.createElement("td");
-        const text = lang === "cs" ? log.lang_cs : log.lang_en;
-        logTd.innerHTML = `🛠️ ${text}`;
-        if (log.link) {
-          logTd.innerHTML += ` 👉 <a href="${log.link}" target="_blank">--INFO--</a>`;
-        }
-
-        tr.appendChild(dateTd);
-        tr.appendChild(logTd);
-        tbody.appendChild(tr);
+    data.forEach(devlog => {
+      const dateStr = new Date(devlog.date).toLocaleDateString("cs-CZ", {
+        day: "2-digit", month: "2-digit", year: "numeric"
       });
-    })
-    .catch(err => {
-      console.error("Chyba načítání devlogů:", err);
+
+      const row = document.createElement("div");
+      row.className = "event-row";
+
+      const colDate = document.createElement("div");
+      colDate.className = "event-date";
+      colDate.textContent = dateStr;
+
+      const colMsg = document.createElement("div");
+      colMsg.className = "event-msg";
+
+      colMsg.innerHTML = devlog.link
+        ? `${devlog.lang_cs} 👉 <a href="${devlog.link}" target="_blank">--INFO--</a>`
+        : devlog.lang_cs;
+
+      row.appendChild(colDate);
+      row.appendChild(colMsg);
+      container.appendChild(row);
     });
+
+  } catch (err) {
+    console.error("Chyba při načítání devlogů:", err);
+  }
 });

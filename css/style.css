@@ -40,7 +40,7 @@ body, html {
 }
 
 .logo img {
-  max-height: 72px;
+  max-height: 125px;
   width: auto;
   object-fit: contain;
 }

@@ -143,3 +143,51 @@ footer,
   color: #888;
   margin-top: auto;
 }
+
+.site-header {
+  width: 100%;
+  background: linear-gradient(to bottom, #101f2e, #0c1826);
+  padding: 20px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.header-inner {
+  max-width: 1080px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 20px;
+}
+
+.logo img {
+  height: 45px;
+}
+
+.header-buttons {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.exit-btn {
+  background: #111;
+  border: none;
+  color: #f0a;
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-size: 20px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.exit-btn:hover {
+  background: #222;
+}
+
+.header-center {
+  display: flex;
+  justify-content: center;
+  margin-top: 10px;
+}
+

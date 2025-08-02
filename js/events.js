@@ -1,14 +1,16 @@
 document.addEventListener("DOMContentLoaded", () => {
   const lang = localStorage.getItem("lang") || "en";
 
-  fetch("https://veralis-backend-production.up.railway.app/data/events.json")
+  fetch("https://veralis-backend-production.up.railway.app/api/events")
     .then(res => res.json())
     .then(events => {
       const container = document.getElementById("event-list");
       if (!container) return;
 
+      container.innerHTML = "";
+
       events.forEach(event => {
-        const text = event.lang[lang] || event.lang.en || "[Missing text]";
+        const text = lang === "cs" ? event.lang_cs : event.lang_en;
         const time = formatTime(event.time);
         const entry = document.createElement("div");
         entry.classList.add("event-entry");

@@ -16,23 +16,26 @@
       <button class="logout-btn" onclick="logout()" title="" data-i18n="logoutTitle">🔒</button>
     </header>
 
-    <main>
-      <button class="enter-btn" data-i18n="enterGame"></button>
+<main>
+  <button class="enter-btn" data-i18n="enterGame"></button>
 
-      <div class="main-columns">
-        <section class="devlogs">
-          <h2 data-i18n="devlogHeader"></h2>
-          <div class="log-entry">⏱️ [01.08] <span>Gateway activated</span> – <a href="#">🔗 <span data-i18n="logReadMore"></span></a></div>
-        </section>
+  <div class="main-columns">
+    <section class="devlogs">
+      <h2 data-i18n="devlogHeader"></h2>
 
-        <div class="placeholder"></div>
+      <!-- Tento prázdný div bude vyplněn JS -->
+      <div id="devlog-list"></div>
+    </section>
 
-        <section class="events">
-          <h2 data-i18n="eventHeader"></h2>
-          <div class="event-entry">🕒 18:25 – Orbital scanner online</div>
-        </section>
-      </div>
-    </main>
+    <div class="placeholder"></div>
+
+    <section class="events">
+      <h2 data-i18n="eventHeader"></h2>
+      <div class="event-entry">🕒 18:25 – Orbital scanner online</div>
+    </section>
+  </div>
+</main>
+
 
     <footer data-i18n="footer"></footer>
   </div>

@@ -131,3 +131,35 @@ footer {
   padding-left: 12px;
 }
 
+/* Obecný styl pro řádek */
+.event-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 14px;
+  color: #ddd;
+}
+
+/* První barva (např. liché řádky) */
+.event-row:nth-child(odd) {
+  background-color: #2a3c59;
+}
+
+/* Druhá barva (např. sudé řádky) */
+.event-row:nth-child(even) {
+  background-color: #1f2a3d;
+}
+
+/* Sloupce */
+.event-date {
+  color: #aaa;
+  min-width: 120px;
+  font-weight: bold;
+}
+
+.event-msg {
+  flex: 1;
+  padding-left: 12px;
+}
+

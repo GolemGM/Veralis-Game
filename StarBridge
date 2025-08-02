@@ -31,7 +31,7 @@
 
     <section class="events">
       <h2 data-i18n="eventHeader"></h2>
-      <div class="event-entry">🕒 18:25 – Orbital scanner online</div>
+      <div id="event-list"></div>
     </section>
   </div>
 </main>

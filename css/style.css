@@ -110,3 +110,24 @@ footer {
   padding-left: 12px;
 }
 
+.event-row {
+  display: flex;
+  justify-content: space-between;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+.event-date {
+  color: #aaa;
+  min-width: 120px;
+  font-weight: bold;
+}
+
+.event-msg {
+  color: #ddd;
+  flex: 1;
+  padding-left: 12px;
+}
+

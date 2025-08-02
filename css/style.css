@@ -8,7 +8,7 @@
 
 body, html {
   height: 100%;
-  background: url("images/backgroundstar.png") no-repeat center center fixed;
+  background: url("../images/backgroundstar.png") no-repeat center center fixed;
   background-size: cover;
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   color: #ddd;

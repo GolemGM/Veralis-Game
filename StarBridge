@@ -7,41 +7,34 @@
   <link rel="stylesheet" href="css/style.css">
   <script defer src="js/auth.js"></script>
   <script defer src="js/logout.js"></script>
+  <script defer src="js/lang.js"></script>
 </head>
 <body>
   <div class="container">
     <header>
-      <div class="logo">Veralis</div>
-      <button class="logout-btn" onclick="logout()" title="Logout">🚪↩️</button>
+      <div class="logo" data-i18n="title"></div>
+      <button class="logout-btn" onclick="logout()" title="" data-i18n="logoutTitle">🔒</button>
     </header>
 
     <main>
-      <button class="enter-btn">🚀 Enter the Game</button>
+      <button class="enter-btn" data-i18n="enterGame"></button>
 
       <div class="main-columns">
         <section class="devlogs">
-          <h2>🛠️ Patch Notes & Dev Logs</h2>
-          <!-- log entries will go here -->
-          <div class="log-entry">⏱️ [01.08] First launch – <a href="#">Discord</a></div>
-          <div class="log-entry">⏱️ [30.07] UI structure built – <a href="#">Discord</a></div>
+          <h2 data-i18n="devlogHeader"></h2>
+          <div class="log-entry">⏱️ [01.08] <span>Gateway activated</span> – <a href="#">🔗 <span data-i18n="logReadMore"></span></a></div>
         </section>
 
-        <div class="placeholder">
-          <!-- Placeholder for graphic (pipe, cable...) -->
-        </div>
+        <div class="placeholder"></div>
 
         <section class="events">
-          <h2>📡 Star News Reporter</h2>
-          <!-- event entries will go here -->
+          <h2 data-i18n="eventHeader"></h2>
           <div class="event-entry">🕒 18:25 – Orbital scanner online</div>
-          <div class="event-entry">🕒 17:10 – Resource surge detected</div>
         </section>
       </div>
     </main>
 
-    <footer>
-      © Veralis Project 2025
-    </footer>
+    <footer data-i18n="footer"></footer>
   </div>
 </body>
 </html>

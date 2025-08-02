@@ -1,4 +1,7 @@
 {
+  "meta": {
+    "title": "Veralis – StarBridge reporter"
+  },
   "title": "Veralis – StarBridge",
   "enterGame": "🚀 Enter the Game",
   "logoutTitle": "Logout",

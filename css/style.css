@@ -149,3 +149,12 @@ footer,
   color: #888;
   margin-top: auto;
 }
+
+/* Změkčení vnitřních nadpisů devlog/event sekcí */
+.devlog-section h2,
+.event-section h2 {
+  font-size: 1.1rem;       /* mírně menší velikost */
+  font-weight: normal;     /* zruší tučnost */
+  margin-top: 12px;        /* mezera nad nadpisem */
+  margin-bottom: 6px;      /* mezera pod nadpisem */
+}

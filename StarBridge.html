@@ -82,7 +82,7 @@
         localStorage.removeItem("token");
         const langParam = new URLSearchParams(window.location.search).get("lang") || "en";
         const loginTarget = langParam === "cs"
-          ? "https://golemgm.github.io/Veralis-Promo/cs/login.html"
+          ? "https://golemgm.github.io/Veralis-Promo/login.html"
           : "https://golemgm.github.io/Veralis-Promo/en/login.html";
         window.location.href = loginTarget;
       });

@@ -2,6 +2,9 @@ document.addEventListener("DOMContentLoaded", async () => {
   const container = document.getElementById("event-list");
   if (!container) return;
 
+  const lang = new URLSearchParams(window.location.search).get("lang") === "cs" ? "cs" : "en";
+  const field = lang === "cs" ? "lang_cs" : "lang_en";
+
   try {
     const res = await fetch("https://veralis-backend-production.up.railway.app/api/events");
     const data = await res.json();
@@ -10,9 +13,9 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     data.forEach(event => {
       const date = new Date(event.timestamp);
-      const dateStr = date.toLocaleDateString("cs-CZ", { day: "2-digit", month: "2-digit", year: "numeric" });
-      const timeStr = date.toLocaleTimeString("cs-CZ", { hour: "2-digit", minute: "2-digit" });
-      const msg = event.lang_cs || event.lang_en;
+      const dateStr = date.toLocaleDateString(lang === "cs" ? "cs-CZ" : "en-GB", { day: "2-digit", month: "2-digit", year: "numeric" });
+      const timeStr = date.toLocaleTimeString(lang === "cs" ? "cs-CZ" : "en-GB", { hour: "2-digit", minute: "2-digit" });
+      const msg = event[field];
 
       const row = document.createElement("div");
       row.className = "event-row";

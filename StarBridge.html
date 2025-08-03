@@ -11,6 +11,8 @@
   <script defer src="js/events.js"></script>
   <script defer src="js/devlogs.js"></script>
 
+  <!-- Script ovladani jazyka -->
+  
   <script>
     const langParam = new URLSearchParams(window.location.search).get("lang");
     const currentLang = langParam === "cs" ? "cs" : "en";
@@ -24,6 +26,7 @@
       loadLanguage(currentLang);
     }
   </script>
+  
 </head>
 <body>
   <div class="page-wrapper">

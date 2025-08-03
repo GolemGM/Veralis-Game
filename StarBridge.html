@@ -63,5 +63,29 @@
 
     <footer class="site-footer" data-i18n="footer">&copy; Veralis Project 2025</footer>
   </div>
+  
+  <!-- Script ovladani Enter Exit -->
+  
+  <script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const enterBtn = document.querySelector(".enter-btn");
+    const exitBtn = document.querySelector(".exit-btn");
+
+    if (enterBtn) {
+      enterBtn.addEventListener("click", () => {
+        window.location.href = "game.html"; // nebo kam má vstoupit hráč
+      });
+    }
+
+    if (exitBtn) {
+      exitBtn.addEventListener("click", () => {
+        localStorage.removeItem("token");
+        const langParam = new URLSearchParams(window.location.search).get("lang") || "en";
+        window.location.href = `login.html?lang=${langParam}`;
+      });
+    }
+  });
+</script>
+
 </body>
 </html>

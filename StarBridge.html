@@ -66,14 +66,14 @@
   
   <!-- Script ovladani Enter Exit -->
   
-  <script>
+<script>
   document.addEventListener("DOMContentLoaded", () => {
     const enterBtn = document.querySelector(".enter-btn");
     const exitBtn = document.querySelector(".exit-btn");
 
     if (enterBtn) {
       enterBtn.addEventListener("click", () => {
-        window.location.href = "game.html"; // nebo kam má vstoupit hráč
+        window.location.href = "https://golemgm.github.io/Veralis-Promo/demogame.html";
       });
     }
 
@@ -81,11 +81,15 @@
       exitBtn.addEventListener("click", () => {
         localStorage.removeItem("token");
         const langParam = new URLSearchParams(window.location.search).get("lang") || "en";
-        window.location.href = `login.html?lang=${langParam}`;
+        const loginTarget = langParam === "cs"
+          ? "https://golemgm.github.io/Veralis-Promo/cs/login.html"
+          : "https://golemgm.github.io/Veralis-Promo/en/login.html";
+        window.location.href = loginTarget;
       });
     }
   });
 </script>
+
 
 </body>
 </html>

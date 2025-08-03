@@ -3,7 +3,9 @@
     "title": "StarBridge | Veralis"
   },
   "enterGame": "🚀 Vstoupit do hry",
-  "devlogHeader": "🛠️ Vývojové deníky",
-  "eventHeader": "📡 Hlášení ze světa",
+  "devlogHeader": "🛠️ Hlášení o změnách ve vývoji",
+  "devlogsubHeader": "🛠️ Vývojové deníky",
+  "eventHeader": "📡 Reportér hvězdného mostu",
+  "eventsubHeader": "📡 Hlášení ze světa",
   "footer": "&copy; Projekt Veralis 2025"
 }

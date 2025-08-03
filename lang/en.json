@@ -1,13 +1,9 @@
 {
   "meta": {
-    "title": "Veralis – StarBridge reporter"
+    "title": "StarBridge | Veralis"
   },
-  "title": "Veralis – StarBridge",
   "enterGame": "🚀 Enter the Game",
-  "logoutTitle": "Logout",
   "devlogHeader": "🛠️ Patch Notes & Dev Logs",
   "eventHeader": "📡 Star News Reporter",
-  "footer": "© Veralis Project 2025",
-  "logReadMore": "Read on Discord",
-  "eventTime": "Time"
+  "footer": "&copy; Veralis Project 2025"
 }

@@ -10,41 +10,54 @@
   <script defer src="js/lang.js"></script>
   <script defer src="js/events.js"></script>
   <script defer src="js/devlogs.js"></script>
+
+  <script>
+    const langParam = new URLSearchParams(window.location.search).get("lang");
+    const currentLang = langParam === "cs" ? "cs" : "en";
+
+    const token = localStorage.getItem("token");
+    if (!token) {
+      window.location.href = `login.html?lang=${currentLang}`;
+    }
+
+    if (typeof loadLanguage === "function") {
+      loadLanguage(currentLang);
+    }
+  </script>
 </head>
 <body>
   <div class="page-wrapper">
-  <header class="site-header">
-  <div class="header-inner">
-    <div class="logo">
-      <img src="images/veralis_logo_transparent512.png" alt="VERALIS">
-    </div>
-    <div class="header-center">
-    <button class="gold-button enter-btn" data-i18n="enterGame">🚀 Enter the Game</button>
-  </div>
-    <div class="header-buttons">
-       <button class="exit-btn">
-  <span style="font-size: 22px; color: black;">⬅</span> Exit
-</button>
-    </div>
-  </div>  
-</header>
-   
+    <header class="site-header">
+      <div class="header-inner">
+        <div class="logo">
+          <img src="images/veralis_logo_transparent512.png" alt="VERALIS">
+        </div>
+        <div class="header-center">
+          <button class="gold-button enter-btn" data-i18n="enterGame">🚀 Enter the Game</button>
+        </div>
+        <div class="header-buttons">
+          <button class="exit-btn">
+            <span style="font-size: 22px; color: black;">⬅</span> Exit
+          </button>
+        </div>
+      </div>  
+    </header>
 
     <main class="content-wrapper">
       <section class="panel devlogs">
         <h2 data-i18n="devlogHeader">🛠️ Patch Notes & Dev Logs</h2>
         <div class="devlog-section">
-  <h2>🛠️ Devlogy</h2>
-  <div id="devlog-list"><div class="event-row">Načítám...</div></div>
-</div>
+          <h2>🛠️ Devlogy</h2>
+          <div id="devlog-list"><div class="event-row">Načítám...</div></div>
+        </div>
       </section>
 
-         <section class="panel events">
+      <section class="panel events">
         <h2 data-i18n="eventHeader">📡 Star News Reporter</h2>
         <div class="event-section">
-  <h2>📢 Hlášení</h2>
-  <div id="event-list"><div class="event-row">Načítám...</div></div>
-</div>
+          <h2>📢 Hlášení</h2>
+          <div id="event-list"><div class="event-row">Načítám...</div></div>
+        </div>
       </section>
     </main>
 

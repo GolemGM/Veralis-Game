@@ -2,6 +2,9 @@ document.addEventListener("DOMContentLoaded", async () => {
   const container = document.getElementById("devlog-list");
   if (!container) return;
 
+  const lang = new URLSearchParams(window.location.search).get("lang") === "cs" ? "cs" : "en";
+  const field = lang === "cs" ? "lang_cs" : "lang_en";
+
   try {
     const res = await fetch("https://veralis-backend-production.up.railway.app/api/devlogs");
     const data = await res.json();
@@ -9,7 +12,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     container.innerHTML = "";
 
     data.forEach(devlog => {
-      const dateStr = new Date(devlog.date).toLocaleDateString("cs-CZ", {
+      const dateStr = new Date(devlog.date).toLocaleDateString(lang === "cs" ? "cs-CZ" : "en-GB", {
         day: "2-digit", month: "2-digit", year: "numeric"
       });
 
@@ -24,8 +27,8 @@ document.addEventListener("DOMContentLoaded", async () => {
       colMsg.className = "event-msg";
 
       colMsg.innerHTML = devlog.link
-        ? `${devlog.lang_cs} 👉 <a href="${devlog.link}" target="_blank">--INFO--</a>`
-        : devlog.lang_cs;
+        ? `${devlog[field]} 👉 <a href="${devlog.link}" target="_blank">--INFO--</a>`
+        : devlog[field];
 
       row.appendChild(colDate);
       row.appendChild(colMsg);

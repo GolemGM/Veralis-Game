@@ -1,13 +1,9 @@
 {
   "meta": {
-    "title": "Veralis – StarBridge hlasatel"
+    "title": "StarBridge | Veralis"
   },
-  "title": "Veralis – StarBridge hlasatel",
   "enterGame": "🚀 Vstoupit do hry",
-  "logoutTitle": "Odhlásit",
-  "devlogHeader": "🛠️ Poznámky k verzím & Vývojový deník",
-  "eventHeader": "📡 Zpravodaj hvězd",
-  "footer": "© Projekt Veralis 2025",
-  "logReadMore": "Zobrazit na Discordu",
-  "eventTime": "Čas"
+  "devlogHeader": "🛠️ Vývojové deníky",
+  "eventHeader": "📡 Hlášení ze světa",
+  "footer": "&copy; Projekt Veralis 2025"
 }

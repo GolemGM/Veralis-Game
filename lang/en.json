@@ -3,7 +3,9 @@
     "title": "StarBridge | Veralis"
   },
   "enterGame": "🚀 Enter the Game",
-  "devlogHeader": "🛠️ Latest notes",
-  "eventHeader": "📡 Recent events",
+  "devlogHeader": "🛠️ Patch Notes & Dev Logs",
+    "devlogsubHeader": "Latest notes",
+  "eventHeader": "📡Star News reporter ",
+    "eventsubHeader": "Recent events", 
   "footer": "&copy; Veralis Project 2025"
 }

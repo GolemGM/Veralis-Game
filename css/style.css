@@ -1,0 +1,160 @@
+/* === Reset a základ === */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body, html {
+  height: 100%;
+  background: url("../images/backgroundstar.png") no-repeat center center fixed;
+  background-size: cover;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  color: #ddd;
+  overflow-x: hidden;
+}
+
+.container,
+.page-wrapper {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* === Header === */
+.site-header {
+  width: 100vw;
+  background: linear-gradient(to bottom, #101f2e, #0c1826);
+  padding: 20px 0 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.header-inner {
+  max-width: 1080px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 20px;
+}
+
+.logo img {
+  max-height: 125px;
+  width: auto;
+  object-fit: contain;
+}
+
+.header-buttons {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.enter-btn,
+.exit-btn {
+  background: linear-gradient(to bottom, #e4b647, #c08f2c);
+  color: black;
+  border: none;
+  padding: 16px 30px;
+  border-radius: 10px;
+  font-size: 20px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.enter-btn:hover,
+.exit-btn:hover {
+  background: linear-gradient(to bottom, #f2cc68, #d69b30);
+}
+
+.header-center {
+  display: flex;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+/* === Layout === */
+.content-wrapper {
+  display: flex;
+  flex: 1;
+  gap: 60px;
+  padding: 30px 0;
+  justify-content: center;
+  max-width: 1080px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.panel,
+.devlogs, .events {
+  background: rgba(10, 20, 30, 0.6);
+  padding: 20px;
+  border-radius: 10px;
+  flex: 1;
+  min-height: 500px;
+}
+
+/* === Event/Devlog Row === */
+.event-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 14px;
+  color: #ddd;
+}
+
+.event-row:nth-child(odd) {
+  background-color: #2a3c59;
+}
+
+.event-row:nth-child(even) {
+  background-color: #1f2a3d;
+}
+
+.event-date {
+  color: #aaa;
+  min-width: 120px;
+  font-weight: bold;
+}
+
+.event-msg {
+  flex: 1;
+  padding-left: 12px;
+  color: #ddd;
+}
+
+.event-msg a {
+  color: #9eb5d6;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.event-msg a:hover {
+  color: #dbe9ff;
+  text-decoration: underline;
+}
+
+/* === Footer === */
+footer,
+.site-footer {
+  text-align: center;
+  padding: 15px 0;
+  font-size: 13px;
+  color: #888;
+  margin-top: auto;
+}
+
+/* Změkčení vnitřních nadpisů devlog/event sekcí */
+.devlog-section h2,
+.event-section h2 {
+  font-size: 1.1rem;       /* mírně menší velikost */
+  font-weight: normal;     /* zruší tučnost */
+  margin-top: 12px;        /* mezera nad nadpisem */
+  margin-bottom: 6px;      /* mezera pod nadpisem */
+}

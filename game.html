@@ -1542,12 +1542,14 @@ function syncSettingsExtrasVal(){
   document.querySelectorAll('[data-extras-inc]').forEach(btn => btn.toggleAttribute('disabled', n >= 5));
 }
 
-
+// --- PATH BASES pro GitHub Pages i lokál ---
+const ROOT = location.pathname.replace(/\/[^\/]*$/, '/'); // např. "/Veralis-Game/"
+const MENU_BASE = ROOT + 'menu/';                         // např. "/Veralis-Game/menu/"
 
 // === Load template (nová verze s label) ===
 async function loadTemplate(key, { signal } = {}) {
   try {
-    const res = await fetch(`/menu/${key}.html`, { signal });
+    const res = await fetch(MENU_BASE + key + '.html', { signal });
     if (!res.ok) throw new Error("fetch fail");
     const html = await res.text();
 

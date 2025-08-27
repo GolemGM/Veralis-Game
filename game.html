@@ -870,6 +870,22 @@ body {
 <!-- === MAIN.html ZAČÁTEK=== ------------------------------------------------------------->
 </head>
 <body>
+
+ <script>
+  // Přesměruj absolutní /menu/... na relativní /Veralis-Game/menu/...
+  (function () {
+    const base = location.pathname.replace(/\/[^\/]*$/, '/') // např. /Veralis-Game/
+    const origFetch = window.fetch;
+    window.fetch = (input, init) => {
+      if (typeof input === 'string' && input.startsWith('/menu/')) {
+        input = base + input.slice(1); // → /Veralis-Game/menu/...
+      }
+      return origFetch(input, init);
+    };
+  })();
+</script>
+
+    
 <div id="game-wrapper">
 <!-- === HEADER === ------------------------------------------------------------------------------------------------->
 <div id="game-header">

@@ -1,0 +1,2044 @@
+<!DOCTYPE html>
+
+<html lang="cs">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Veralis Game</title>
+<style>
+    /* === GLOBAL === */
+body {
+  margin: 0;
+  background-color: #e2f0ff; /* jemná světlá modrá */
+  font-family: sans-serif;
+  color: #ddd;
+}
+#game-wrapper {
+  background: #474c50;
+  width: 1500px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  position: relative; /* <- tohle přidej */
+}
+
+    /* === HEADER === */
+    #game-header {
+      width: 1500px;
+      height: 200px;
+      display: flex;
+      border: 1px solid black;
+    }
+
+    .header-block {
+      height: 100%;
+      position: relative;
+      border: 1px solid black;
+      box-sizing: border-box;
+    }
+
+    #header-left { width: 200px; }
+    #header-center { width: 1200px; }
+    #header-right { width: 100px; }
+
+    .inner-block {
+      position: absolute;
+      top: 5px; left: 5px; right: 5px; bottom: 5px;
+      border: 1px solid black;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      text-align: center;
+      box-sizing: border-box;
+      padding: 4px;
+      font-size: 13px;
+      flex-direction: column;
+    }
+
+    .game-button {
+      width: 70px;
+      height: 40px;
+      margin: 3px 0;
+      background: deepskyblue;
+      border-radius: 6px;
+      border: none;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    /* === MAIN === */
+#game-main { width:1500px; display:flex; align-items:flex-start; position: relative; }
+
+    /* === TV BLOK === */
+#tv-wrapper { width:1200px; position:relative; height:auto; background:#0d111a; min-height:600px; isolation: isolate; }
+ 
+ 
+
+    /* === FRAME BLOKY – BEZ OBRÁZKŮ === */
+  #tv-frame { position:absolute; top:0; left:0; right:0; bottom:0; pointer-events:none; }
+
+
+    .frame-corner, .frame-top, .frame-bottom, .frame-side {
+      background-color: rgba(255,255,255,0.08);
+      position: absolute;
+    }
+
+    /* Rozměry rámových bloků */
+    .frame-corner {
+      width: 100px;
+      height: 100px;
+      z-index: 5;
+    }
+
+    #frame-ctl { top: 0; left: 0; }
+    #frame-ctr { top: 0; right: 0; }
+    #frame-cbl { bottom: 0; left: 0; }
+    #frame-cbr { bottom: 0; right: 0; }
+
+    .frame-top, .frame-bottom { left:100px; right:100px; height:76px; position:absolute; }
+
+    #frame-top { top:0; }
+    #frame-bottom { bottom:0; }
+
+   .frame-side.right {
+  width: 16px;
+  height: 100px;
+  z-index: 3;
+  right: 0; 
+}
+
+.frame-side.left {
+  width: 76px;
+  height: 100px;
+  z-index: 3;
+  left: 0;
+}
+
+    #frame-l1 { top: 100px; left: 0; }
+    #frame-l2 { top: 200px; left: 0; }
+    #frame-l3 { top: 300px; left: 0; }
+    #frame-l4 { top: 400px; left: 0; }
+
+    #frame-r1 { top: 100px; right: 0; }
+    #frame-r2 { top: 200px; right: 0; }
+    #frame-r3 { top: 300px; right: 0; }
+    #frame-r4 { top: 400px; right: 0; }
+
+    /* === OBSAH TV === */
+#tv-viewport,
+#tv-content,
+#tv-petbot {
+  position: absolute;
+  top: 76px;
+  left: 76px;  
+  bottom: 76px;
+  padding:29px; 
+  min-height: 448px;
+  background: transparent;  
+  overflow:visible;
+  box-sizing:border-box; 
+}
+
+/* --- BLUR vrstvy --- */
+/* TABy rozmazávají jen viewport */
+#tv-viewport.by-tabs { 
+  filter: blur(6px);
+  pointer-events: none;
+}
+
+/* PetBot rozmazává viewport i content */
+#tv-viewport.by-pet,
+#tv-content.by-pet {
+  filter: blur(6px);
+  pointer-events: none;
+}
+
+
+#tv-viewport {
+  right: 76px;
+  z-index: 2;
+  pointer-events:auto; 
+}
+
+#tv-content {
+  right: 16px;
+  pointer-events:auto; 
+  z-index: 3; /* nad viewport */ 
+}
+
+#tv-petbot {
+  right: 16px;
+  pointer-events:none; 
+  z-index: 5; /* nad viewport */ 
+  
+}
+
+/* dolní mezera 30 px, která JE součástí toku obsahu (neukousne se) */
+#tv-petbot::after{
+  content:"";
+  display:block;
+  height:29px;             /* spodní mezera */
+}
+
+#tv-petbot .tab.petbot,
+#tv-petbot #pet-petbot-open {
+  pointer-events: auto;
+}
+
+.tab.petbot,
+.tab.menu.closed { cursor: pointer; }
+
+    /* === ZÁLOŽKY === */
+.tab {
+  width: 60px;
+  height: 60px;
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  background: crimson;
+  color: white;
+  font-weight: bold;
+  font-size: 12px;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px 0 0 6px; /* pouze levá strana zaoblená */
+}
+
+    .petbot { top: 29px; background: deepskyblue; }
+  #tab-home    { top: 99px; }
+#tab-user    { top: 164px; }
+#tab-world  { top: 229px; }
+#tab-custom  { top: 294px; }
+
+#tab-home-open {
+  top: 99px;
+}
+#tab-user-open {
+  top: 164px;
+}
+#tab-world-open {
+  top: 229px;
+}
+#tab-custom-open {
+  top: 294px;
+}
+
+    /* === PLAYER BADGE === */
+    #player-badge { width:300px; height:580px; box-sizing:border-box; position:absolute; left:1200px; top:0; }
+
+    #player-badge .inner-block {
+      position: absolute;
+      top: 5px; left: 5px; right: 5px; bottom: 5px;
+      border: 1px solid black;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      gap: 6px;
+      padding: 10px;
+      box-sizing: border-box;
+      z-index:5;
+    }
+
+    .player-name {
+      font-weight: bold;
+      font-size: 14px;
+    }
+
+    .player-rank {
+      font-style: italic;
+      font-size: 12px;
+    }
+
+    .player-avatar img {
+      width: 64px;
+      height: 64px;
+      border-radius: 6px;
+      object-fit: cover;
+    }
+
+    .player-clan {
+      font-size: 12px;
+      color: #9eb5d6;
+    }
+/* === STYLE HEADER 2 === -------------------------------------*/
+#header-center .inner-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between; /* čas nahoře, lokace dole */
+  padding: 5px 0;
+}
+
+.server-time {
+  width: 200px;
+  padding: 4px 8px;
+  background: #222;
+  color: #ccc;
+  font-size: 12px;
+  text-align: center;
+  border-radius: 4px;
+  margin-top: 5px;
+}
+
+.location-label {
+  width: 800px;
+  padding: 8px 12px;
+  background: #000;
+  color: #fff;
+  font-size: 20px;
+  font-weight: bold;
+  text-align: left;
+  border-radius: 4px;
+  margin-bottom: 5px;
+}
+/* === STYLE PLAYER BADGE === -------------------------------------*/
+.player-row {
+  width: 100%;
+  padding: 6px 8px;
+  border: 1px solid #333;
+  background: #1a1a1a;
+  color: #ddd;
+  font-size: 13px;
+  text-align: center;
+  border-radius: 4px;
+  margin-bottom: 6px;
+  box-sizing: border-box;
+}
+
+/* Nadpis */
+.title-row {
+  font-size: 14px;
+  font-weight: bold;
+}
+
+/* Jméno */
+.name-row {
+  font-style: italic;
+}
+
+/* Avatar – zarovnaný jako řádek */
+.player-avatar-row {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 6px;
+}
+
+.player-avatar-row img {
+  width: 64px;
+  height: 64px;
+  border-radius: 4px;
+  border: 1px solid #444;
+  object-fit: cover;
+}
+
+/* Energie bar */
+.energy-label {
+  background: transparent;
+  border: none;
+  color: #aaa;
+  font-size: 12px;
+  margin-bottom: 2px;
+}
+
+.player-energy-bar {
+  position: relative;
+  background: #000;
+  height: 18px;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 6px;
+  width: 100%;
+  border: 1px solid #333;
+}
+
+.player-energy-fill {
+  background: #4caf50;
+  height: 100%;
+}
+
+.player-energy-text {
+  position: absolute;
+  width: 100%;
+  text-align: center;
+  top: 0;
+  left: 0;
+  font-size: 12px;
+  line-height: 18px;
+  color: #fff;
+}
+
+/* Badge část */
+.badge-label {
+  background: transparent;
+  border: none;
+  color: #aaa;
+  font-size: 12px;
+  margin-bottom: 2px;
+  text-align: left;
+  padding-left: 4px;
+}
+
+/* Dynamické varianty */
+.badge-count-1 .player-badge-icon {
+  width: 48px;
+  height: 48px;
+  font-size: 20px;
+}
+.badge-count-3 .player-badge-icon:nth-child(3) {
+  order: 2;
+  margin-top: 4px;
+}
+
+/* Clan */
+.clan-row {
+  font-size: 12px;
+  color: #9eb5d6;
+}
+
+/* Nastavení (klikací) */
+.settings-button {
+  background: #1a2a3a;
+  color: #fff;
+  border: 1px solid #333;
+  padding: 6px;
+  font-size: 13px;
+  border-radius: 4px;
+  width: 100%;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.settings-button:hover {
+  background: #2b3b4c;
+}
+.badge-row {
+  padding: 6px 0; /* snížíme padding – badge mají vlastní velikost */
+  background: #1a1a1a;
+}
+
+.badge-zone {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.player-badge-icon {
+  width: 36px;
+  height: 36px;
+  background: #a67c52;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 16px;
+  color: #fff;
+}
+
+/* Dynamické velikosti */
+.badge-count-1 .player-badge-icon {
+  width: 48px;
+  height: 48px;
+  font-size: 20px;
+}
+
+.badge-count-3 .player-badge-icon:nth-child(3) {
+  order: 2;
+  margin-top: 4px;
+}
+
+/* === STYLE TAB OPEN === -------------------------------------*/
+.tab-icon-frame {
+  width: 40px;
+  height: 40px;
+  border: 1px solid white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-sizing: border-box;
+}
+
+.tab.menu.closed .tab-icon-frame {
+    width: 40px;
+    height: 40px;
+    border: 1px solid white;
+    background: crimson;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-sizing: border-box;
+}
+
+.tab-close {
+  width: 20px;
+  height: 20px;
+  background: black;
+  color: white;
+  font-size: 14px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 10px;
+  cursor: pointer;
+  pointer-events:auto;
+}
+
+.tab-btn {
+  width: 225px;
+  height: 60px;
+  line-height: 60px;
+  background: deepskyblue;
+  border: none;
+  color: black;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  margin-right: 5px;
+}
+
+.tab-btn:last-child {
+  margin-right: 10px;
+}
+
+.tab.menu.open .tab-icon-frame {
+  margin-right: 10px;
+  border: 1px solid white;
+  background: crimson;
+ width: 40px;
+  height: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-sizing: border-box;
+}
+
+/* === debug na barvy verticalu ===------------------------- */
+#frame-l1, #frame-r1 { background-color: rgba(255,255,255,0.08); }
+#frame-l2, #frame-r2 { background-color: rgba(255,255,255,0.08); }
+#frame-l3, #frame-r3 { background-color: rgba(255,255,255,0.08); }
+#frame-l4, #frame-r4 { background-color: rgba(255,255,255,0.08); }
+
+
+  
+/* === EXPANSION COLUMNS (.vl / .vr) === */
+.vl, .vr {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 0; /* purely structural spacing columns */
+  pointer-events: none;
+}
+
+#frame-cbl{bottom:0;left:0;} #frame-cbr{bottom:0;right:0;} #frame-bottom { bottom:0; }
+
+/* dolní „pravá“ mezera 30 px, započítaná do toku obsahu */
+#tv-viewport::after{
+  content:"";
+  display:block;
+  height:29px;            /* spodní mezera */
+}
+
+/* === PETBOT MENU ========================================================================================================= */
+#pet-petbot-open {
+  position: relative;
+  margin: 0px 60px 0 0px;   /* top right bottom left */
+  width: auto;                /* necháme prohlížeč dopočítat */
+  height: auto;
+  background: rgba(0,0,0,0.8);
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+  z-index: 50;
+}
+
+/* Zavírací tlačítko */
+.pet-close {
+  align-self: flex-end;
+  width: 28px;
+  height: 28px;
+  background: black;
+  color: white;
+  font-size: 16px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  margin-bottom: 10px;
+}
+.pet-close:hover{ background:#333; }
+.pet-btn:hover{ background:#00bfff; }
+
+/* Tlačítka uvnitř menu */
+.pet-btn {
+  background: deepskyblue;
+  border: none;
+  border-radius: 4px;
+  margin: 4px 0;
+  padding: 8px;
+  font-weight: bold;
+  color: black;
+  text-align: center;
+  cursor: pointer;
+}
+
+/* Panel je na svém místě, „narůstá“ z pravého okraje směrem doleva */
+.tab.menu.open{
+  position:absolute;
+  right:0;
+  display:flex;
+
+  visibility:hidden;
+  opacity:0;
+
+  /* reveal direction = zprava doleva */
+  transform: scaleX(0);
+  transform-origin: right center;
+  transition: transform .35s ease, opacity .20s ease;
+  will-change: transform;
+
+  pointer-events:none;
+  overflow: hidden;            /* jistota že nic nečouhá při scale */
+}
+
+/* Aktivní panel – plná šířka */
+.tab.menu.open.is-active{
+  visibility:visible;
+  opacity:1;
+  transform: scaleX(1);
+  pointer-events:auto;
+}
+
+/* Okamžité zavření (tvůj JS přidává .no-anim) */
+.tab.menu.open.no-anim{
+  transition: none !important;
+}
+
+@supports not (clip-path: inset(0 100% 0 0)) {
+  .tab.menu.open { transform: translateX(110%); transition: transform .35s ease, opacity .20s ease; }
+  .tab.menu.open.is-active { transform: translateX(0); }
+}
+
+/* otevřený panel: absolutně vpravo a s jasnou šířkou + výškou */
+.tab.menu.open{
+  position: absolute;
+  right: 0;
+  width: 1030px;   /* to „1000+ px“ co dřív drželo panel */
+  height: 60px;
+  z-index: 50;
+}
+
+/* zůstává tvoje animace/viditelnost přes .is-active */
+.tab.menu.open.is-active{
+  visibility: visible;
+  opacity: 1;
+  transform: scaleX(1);
+  pointer-events: auto;
+}
+
+/* 1) kurzor ruky na klikacích prvcích */
+.tab-btn,
+.tab.menu.closed,
+.tab.menu.open .tab-close {
+  cursor: pointer;
+}
+
+/* 2) jistota clicků jen když je panel aktivní */
+.tab.menu.open { pointer-events: none; }                /* default = mrtvé */
+.tab.menu.open.is-active { pointer-events: auto; }      /* panel živý */
+.tab.menu.open.is-active * { pointer-events: auto; }    /* děti také živé */
+
+/* 3) ať panel není přikrytý (pro jistotu) */
+.tab.menu.open { z-index: 50; }
+
+/* === VIEWPORT MODULE (embed) ==----------------------------------------------------------------------------------------------------------------------------------------------= */
+/* === VIEWPORT MODULE (embed) ==----------------------------------------------------------------------------------------------------------------------------------------------= */
+/* === VIEWPORT MODULE (embed) ==----------------------------------------------------------------------------------------------------------------------------------------------= */
+/* === VIEWPORT MODULE (embed) ==----------------------------------------------------------------------------------------------------------------------------------------------= */
+:root{
+  --vp-w: 100%;   
+  --vp-content-max: 100%; 
+  --vp-min-h: 448px;
+  --vp-pad: 0px;
+  --frame: #4a6a82;
+  --bg: #0b1116;
+  --panel: #111a21;
+  --line: #2b3c46;
+  --text: #d2e9f2;
+  --accent: #a2f0ff;
+  --gap: 24px;
+}
+
+.viewport {
+  width: 100%;
+  max-width: var(--vp-w);
+  margin: 16px 0;
+  background: transparent;   /* žádný rámeček */
+  border-radius: 0;
+  box-shadow: none;
+  padding: var(--vp-pad);
+  display: block;
+  gap: var(--gap);
+}
+
+.panel {
+  background: var(--panel);
+  border-radius: 12px;           /* radius drží každý panel zvlášť */
+  box-shadow: 0 0 0 2px var(--frame) inset;
+  margin-bottom: var(--gap);     /* aby se nespojovaly dohromady */
+}
+.panel .content-wrap{
+  width: 100%;
+  max-width: var(--vp-content-max);   /* dříve 1000px */
+  margin: 0;                          /* bez centrování */
+}
+.panel.empty::after{ content: attr(data-ph); position:absolute; right:12px; bottom:8px; font-size:12px; opacity:.6; }
+.panel:not(.empty){ min-height: unset; }
+
+/* Box (vnitřek panelu) */
+.view-box{
+  width: 100%;
+  max-width: var(--vp-content-max);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: #0f1a22;
+  /* PŮVODNĚ: overflow: hidden; */
+  overflow: visible;            /* ← povolíme přesah menu ven z boxu */
+  position: relative;           /* ← kotva pro absolutní menu */
+  background-clip: padding-box;
+}
+.view-head{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:10px 12px;
+  border-bottom:1px solid var(--line);
+  background:#0f1a22;
+  border-top-left-radius:12px;
+  border-top-right-radius:12px;
+  flex-wrap: wrap;
+  position: relative;           /* ← kvůli z-index */
+  z-index: 2;                   /* ← nad view-body */
+}
+
+.head-left{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+.head-right{ margin-left:auto; display:flex; gap:8px; align-items:center; }
+.back-btn{ border:1px solid var(--line); background:transparent; color:var(--text); border-radius:8px; height:28px; padding:0 10px; cursor:pointer; }
+.back-btn:disabled{ opacity:.5; cursor:not-allowed; pointer-events:none; }
+.view-title{ font-weight:700; }
+.ctrl{ height:28px; padding:0 10px; border-radius:8px; border:1px solid var(--line); background:transparent; color:var(--text); cursor:pointer; }
+.ctrl:hover{ background:#132029; }
+.ctrl[disabled]{ opacity:.5; cursor:not-allowed; }
+
+/* PIN dropdown */
+.pin-dropdown{ display:inline-block; position: relative; }
+.pin-dropdown .menu{
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  display: none;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #0f1a22;
+  width: max-content;
+  min-width: 160px;
+  white-space: nowrap;
+  z-index: 9999;                /* ← nad zbytkem boxu */
+  max-height: 300px;            /* (volitelně) */
+  overflow: auto;               /* (volitelně) */
+}
+
+.pin-dropdown.open .menu{ display:block; }
+.pin-dropdown .item{ padding:6px 12px; white-space:nowrap; cursor:pointer; }
+.pin-dropdown .item:hover{ background:#15222b; }
+.pin-dropdown .item.busy{ color:#ff8080; }
+
+.view-body{ 
+  padding:14px; 
+  display:grid; 
+  gap:12px; 
+  position: relative;
+  z-index: 1;                   /* ← pod hlavičkou */
+}
+.placeholder{ padding:12px; background:#101b23; border:1px dashed var(--line); border-radius:10px; }
+
+/* BOTTOM sjednocení vzhledu */
+#menuBottom { overflow: hidden; }
+#menuBottom .head {
+  display:flex; align-items:center; gap:10px; padding:10px 12px; border-bottom:1px solid var(--line); background:#0f1a22;
+}
+#menuBottom .title { font-weight:600; }
+#menuBottom .x { margin-left:auto; height:28px; padding:0 10px; border:1px solid var(--line); background:transparent; color:var(--text); border-radius:8px; cursor:pointer; }
+#menuBottom .body { padding:12px; }
+
+/* Extras */
+.extras{ display:flex; flex-direction:column; gap:var(--gap); }
+.extra{ border:1px solid var(--line); border-radius:12px; background:#0e171e; overflow:hidden; }
+.extra .head{ display:flex; align-items:center; gap:10px; padding:10px 12px; border-bottom:1px solid var(--line); background:#0f1a22; }
+.extra .title{ font-weight:600; }
+.extra .x{ margin-left:auto; height:28px; padding:0 10px; border:1px solid var(--line); background:transparent; color:var(--text); border-radius:8px; cursor:pointer; }
+.extra .body{ padding:12px; }
+
+/* === VIEWPORT MODULE (konec) ==----------------------------------------------------------------------------------------------------------------------------------------------= */
+
+/* === VP side launcher (pod player badge) ===TESTOVACI OVLADANI VIEWPORTU */
+#vp-side{
+  width: 220px;        /* srovnej s šířkou badge (případně 200–240) */
+  margin: 8px 0 0 auto;/* zarovná vpravo ve sloupci badge */
+}
+
+.launch-vertical{
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+#vp-side .launch .launch-btn{
+  width: 100%;
+  height: 36px;
+  padding: 0 10px;
+  border-radius: 8px;
+  border: 1px solid var(--line, #2b3c46);
+  background: #101a22;
+  color: var(--text, #d2e9f2);
+  text-align: left;
+  cursor: pointer;
+  font-weight: 600;
+}
+#vp-side .launch .launch-btn:hover{
+  background: #13222c;
+}
+/* === VIEWPORT MODULE (konec) ==----------------------------------------------------------------------------------------------------------------------------------------------= */
+/* === VIEWPORT MODULE (konec) ==----------------------------------------------------------------------------------------------------------------------------------------------= */
+
+/* Rámy TV jsou jen dekor, nesmí chytat kliky */
+#tv-frame .frame-top,
+#tv-frame .frame-bottom,
+#tv-frame .frame-side,
+#tv-frame .frame-corner {
+  pointer-events: none;
+  z-index: 1;           /* nízko */
+}
+
+/* --- TAB MENU: interaction & blur (canonical) --- */
+
+/* 1) Kliká se jen v aktivním panelu (žádné wildcards) */
+.tab.menu.open { pointer-events: none; cursor: default; }
+.tab.menu.open.is-active { pointer-events: auto; }
+
+/* 2) Ruka jen tam, kde se opravdu kliká */
+.tab.menu.closed { cursor: pointer; }           /* sloupec ikon vpravo */
+.tab.menu.open .tab-close { cursor: pointer; }  /* křížek */
+.tab-btn { cursor: pointer; }                   /* tlačítka v panelu */
+
+/* 3) Ikonky uvnitř otevřeného panelu nejsou klikací */
+.tab.menu.open .tab-icon-frame,
+.tab.menu.open .tab-menu-icon { cursor: default; }
+
+/* 4) Blur viewportu, když je cokoliv otevřené */
+#tv-viewport.has-open { filter: blur(4px); }
+
+/* #tv-content je nad viewportem jen vizuálně, kliky propouští */
+#tv-content { pointer-events: none; }
+
+/* ale interaktivní prvky v něm zůstávají živé */
+#tv-content .tab.menu.closed,
+#tv-content .tab.menu.open.is-active,
+#tv-content .tab.menu.open.is-active * {
+  pointer-events: auto;
+}
+
+[data-extras] button[disabled]{ opacity:.4; pointer-events:none; }
+
+/* Dočasně vypneme Custom tab */
+#tab-custom,
+#tab-custom-open { display: none !important; }
+
+</style>
+
+<!-- === STYLE KONEC ===-------------------------------------------------------------- -->
+<!-- === ----------- ===----------------------------------------------------------- -->
+<!-- === MAIN.html ZAČÁTEK=== ------------------------------------------------------------->
+</head>
+<body>
+<div id="game-wrapper">
+<!-- === HEADER === ------------------------------------------------------------------------------------------------->
+<div id="game-header">
+<div class="header-block" id="header-left">
+<div class="inner-block">Blok Logo</div>
+</div>
+<div class="header-block" id="header-center">
+<div class="inner-block">
+<div class="server-time">🕒 14:12:47</div>
+<div class="location-label">🌍 Runalis / Sektor 4B</div>
+</div>
+</div>
+<div class="header-block" id="header-right">
+<div class="inner-block">
+<button class="game-button">Support</button>
+<button class="game-button">Discord</button>
+<button class="game-button" data-open="account">Account</button>
+<button class="game-button">Logout</button>
+</div>
+</div>
+</div>
+<!-- === MAIN === ------------------------------------------------------------------------------------------------->
+<div id="game-main">
+<div id="tv-wrapper">
+
+<!-- RÁM ------------------------------------------------------------------------------------------------->
+<div id="tv-frame">
+<div class="frame-corner" id="frame-ctl"></div>
+<div class="frame-top" id="frame-top"></div>
+<div class="frame-corner" id="frame-ctr"></div>
+<div class="frame-side left" data-index="1" data-side="left" id="frame-l1"></div>
+<div class="frame-side left" data-index="2" data-side="left" id="frame-l2"></div>
+<div class="frame-side left" data-index="3" data-side="left" id="frame-l3"></div>
+<div class="frame-side left" data-index="4" data-side="left" id="frame-l4"></div>
+<div class="frame-side right" data-index="1" data-side="right" id="frame-r1"></div>
+<div class="frame-side right" data-index="2" data-side="right" id="frame-r2"></div>
+<div class="frame-side right" data-index="3" data-side="right" id="frame-r3"></div>
+<div class="frame-side right" data-index="4" data-side="right" id="frame-r4"></div>
+<div class="frame-corner" id="frame-cbl"></div>
+<div class="frame-bottom" id="frame-bottom"></div>
+<div class="frame-corner" id="frame-cbr"></div>
+</div>
+<!-- PRACOVNÍ VIEWPORT ------------------------------------------------------------------------------------------------>
+<div id="tv-viewport">
+    <!-- Viewport panely ------------------------------------------------------------------------------------------------->
+  <div class="viewport" id="viewport">
+    <!-- TOP -->
+    <section class="panel empty" id="menuTop" data-ph="menu.top (placeholder 1000×300)">
+      <div class="content-wrap" id="topWrap"></div>
+    </section>
+    <!-- TOP placeholder -->
+    <section class="panel placeholder" id="menuTopPlaceholder">
+      <div class="placeholder-text">Vyčkávám na otevření menu…</div>
+    </section>
+    <!-- BOTTOM -->
+    <section class="panel empty" id="menuBottom" data-ph="menu.bottom (placeholder 1000×300)">
+      <div class="content-wrap" id="bottomWrap"></div>
+    </section>
+    <!-- EXTRAS -->
+    <section class="extras" id="extras"></section>
+  </div>
+</div>
+
+<!-- TV CONTENT ------------------------------------------------------------------------------------------------->
+<div id="tv-content">
+<div class="tab menu closed" id="tab-home"><div class="tab-icon-frame">🏠</div></div>
+<div class="tab menu closed" id="tab-user"><div class="tab-icon-frame">🧍</div></div>
+<div class="tab menu closed" id="tab-world"><div class="tab-icon-frame">🪐</div></div>
+<div class="tab menu closed" id="tab-custom" hidden aria-hidden="true">
+  <div class="tab-icon-frame">⚙️</div>
+</div>
+<!-- menu záložek po vyjetí ------------------------------------------------------------------------------------------------->
+<div class="tab menu open" id="tab-home-open">
+<div class="tab-close">✖</div>
+<div class="tab-icon-frame">🏠</div>
+<div class="tab-btn" id="tab1menu1">Základna</div>
+<div class="tab-btn" id="tab1menu2">Garáž</div>
+<div class="tab-btn" id="tab1menu3">Lokace</div>
+<div class="tab-btn" id="tab1menu4">Výzkum</div>
+</div>
+<!-- Vyjížděcí záložka USER ------------------------------------------------------------------------------------------------->
+<div class="tab menu open" id="tab-user-open">
+<div class="tab-close">✖</div>
+<div class="tab-icon-frame">🧍</div>
+<div class="tab-btn" id="tab2menu1">Profil</div>
+<div class="tab-btn" id="tab2menu2">Inventář</div>
+<div class="tab-btn" id="tab2menu3">Efekty</div>
+<div class="tab-btn" id="tab2menu4">Cestování</div>
+</div>
+<!-- Vyjížděcí záložka world ------------------------------------------------------------------------------------------------->
+<div class="tab menu open" id="tab-world-open">
+<div class="tab-close">✖</div>
+<div class="tab-icon-frame">🪐</div>
+<div class="tab-btn" id="tab3menu1">Události</div>
+<div class="tab-btn" id="tab3menu2">Pošta</div>
+<div class="tab-btn" id="tab3menu3">Statistiky</div>
+<div class="tab-btn" id="tab3menu4">Klan</div>
+</div>
+<!-- Vyjížděcí záložka custom ------------------------------------------------------------------------------------------------->
+<div class="tab menu open" id="tab-custom-open">
+<div class="tab-close">✖</div>
+<div class="tab-icon-frame">⚙️</div>
+<div class="tab-btn" id="tab4menu1">Nastavitelné 1</div>
+<div class="tab-btn" id="tab4menu2">Nastavitelné 2</div>
+<div class="tab-btn" id="tab4menu3">Nastavitelné 3</div>
+<div class="tab-btn" id="tab4menu4">Nastavitelné 4</div>
+</div>
+</div> <!-- konec #tv-content ------------------------------------------------------------------------------------------------->
+<!-- Oblast PetBota TV-Petbot ---------------------------------------------------------->
+<div id="tv-petbot">  
+
+  <!-- PetBot tlačítko ------------------------------------------------------------------------------------------------->
+  <div class="tab petbot">
+    <div class="tab-icon-frame">🤖</div>
+  </div>
+
+  <div class="pet menu open" id="pet-petbot-open">
+    <div class="pet-close">✖</div>
+    <div class="tab-icon-frame">🤖</div>
+    <div class="pet-btn">Dialog</div>
+    <div class="pet-btn">Nápověda</div>
+    <div class="pet-btn">Moduly</div>
+  </div>
+</div> <!-- konec #tv-petbot -------------------------------------------------------------->
+<!-- INFO PANEL -->
+<div id="player-badge">
+<div class="inner-block">
+<div class="player-row title-row">Velitel</div>
+<div class="player-row name-row">Name</div>
+<div class="player-avatar-row">
+<img alt="Profil hráče" src="images/player_avatar_placeholder.png"/>
+</div>
+<div class="player-row energy-label">🔋 Energie</div>
+<div class="player-energy-bar">
+<div class="player-energy-fill" style="width: 80%;"></div>
+<div class="player-energy-text">80 / 100</div>
+</div>
+<div class="player-row badge-row">
+<div class="badge-zone badge-count-2">
+<div class="player-badge-icon">🛠</div>
+<div class="player-badge-icon">🔬</div>
+</div>
+</div>
+<div class="player-row clan-row">🏰 Název klanu</div>
+<button class="player-row settings-button" data-open="settings">⚙️ Nastavení</button>
+</div>
+</div>
+</div>
+</div>
+<!-- === Scripty  === --------------------------------------->
+  <!-- === script TAB menu open, blur, pointer none  === --------------------------------------------------------------------------------------->
+   <script>
+(() => {
+  const OPEN_PANEL_IDS = ['tab-home-open','tab-user-open','tab-world-open'];
+
+
+  // zjistí, zda je nějaký panel aktivní
+  function anyOpen(){
+    return OPEN_PANEL_IDS.some(id => document.getElementById(id)?.classList.contains('is-active'));
+  }
+
+  // nezávislá blur logika (nevolá interní updateTvBlur)
+  function applyBlur(){
+    const vp = document.getElementById('tv-viewport') || document.getElementById('tv-content') || document.body;
+    vp.classList.toggle('has-open', anyOpen());
+  }
+
+  // „reset“ event listenerů (klon prku zruší staré handlery, které mohly přidávat .is-active zpět)
+  function resetNodeEvents(el){
+    const clone = el.cloneNode(true);
+    el.parentNode.replaceChild(clone, el);
+    return clone;
+  }
+
+  function bindTabToggle(closedId, openId){
+    let closed = document.getElementById(closedId);
+    let open   = document.getElementById(openId);
+    if(!closed || !open) return;
+
+    // zruš staré listenery (kvůli původnímu setupTab)
+    closed = resetNodeEvents(closed);
+    const closeBtn = open.querySelector('.tab-close');
+    if (closeBtn) resetNodeEvents(closeBtn);
+
+    // toggle na ikonku záložky
+    closed.addEventListener('click', (e) => {
+      e.preventDefault();
+      const wasActive = open.classList.contains('is-active');
+
+      // zavřít všechno
+      OPEN_PANEL_IDS.forEach(id => document.getElementById(id)?.classList.remove('is-active'));
+
+      // pokud nebyl aktivní, otevřít; pokud byl, nechat vše zavřené
+      if(!wasActive) open.classList.add('is-active');
+
+      applyBlur();
+    });
+
+    // křížek uvnitř panelu zavře
+    const closeBtn2 = open.querySelector('.tab-close');
+    if (closeBtn2){
+      closeBtn2.addEventListener('click', (e) => {
+        e.preventDefault();
+        open.classList.remove('is-active');
+        applyBlur();
+      });
+    }
+  }
+
+  // napojení všech 4 tabů
+  bindTabToggle('tab-home','tab-home-open');
+  bindTabToggle('tab-user','tab-user-open');
+  bindTabToggle('tab-world','tab-world-open');
+  // Custom tab dočasně vypnutý
+  // bindTabToggle('tab-custom','tab-custom-open');
+
+  // pokud používáš tlačítka uvnitř panelu pro otevření obsahu:
+  // window.VeralisVP?.openMenu?.(key) — nech beze změny
+
+})();
+</script>
+
+<!-- === Výpočet výšky Tv-wrapper podle obsahu jeho dětí, viewport a petbot === ------------------------------------------------------------------>
+<script>
+(() => {
+  // Constants matching the current layout
+  const BASE_VIEWPORT       = 448; // base gap between frame-top and frame-bottom
+  const SIDE_SEGMENT_HEIGHT = 100; // height of each side bar segment
+  const SIDE_SEGMENT_START  = 500; // first dynamic segment starts at 500px (after L1–L4)
+  const MARGIN_FRAME        = 76;  // top/bottom bar height = viewport margin
+
+  const tvWrapper  = document.getElementById('tv-wrapper');
+  const tvViewport = document.getElementById('tv-viewport');
+  const tvFrame    = document.getElementById('tv-frame');
+  const tvPetbot   = document.getElementById('tv-petbot');
+
+  // Visual height helper (covers absolutely-positioned descendants too)
+  function visualHeight(el) {
+    if (!el) return 0;
+    const r = el.getBoundingClientRect();
+    let maxBottom = r.bottom;
+    el.querySelectorAll('*').forEach(n => {
+      const b = n.getBoundingClientRect().bottom;
+      if (b > maxBottom) maxBottom = b;
+    });
+    return Math.round(maxBottom - r.top);
+  }
+
+  function ensureFrameForContent() {
+    if (!tvWrapper || !tvViewport || !tvFrame) return;
+
+    // 1) Compute required height (max of viewport vs content)
+    const hViewport = Math.max(BASE_VIEWPORT, tvViewport.scrollHeight, visualHeight(tvViewport));
+    const hPetbot  = Math.max(tvPetbot.scrollHeight, visualHeight(tvPetbot));
+    const viewportContentHeight = Math.max(hViewport, hPetbot);
+
+    // 2) Grow the wrapper so frame-bottom kisses the viewport/content bottom (via 76px margin)
+    const requiredWrapperMinHeight = viewportContentHeight + (MARGIN_FRAME * 2);
+    tvWrapper.style.minHeight = requiredWrapperMinHeight + 'px';
+
+    // 3) Calculate how many extra side bars we need (beyond L1–L4) in 100px steps
+    const extraSegments = Math.max(0, Math.ceil((viewportContentHeight - BASE_VIEWPORT) / SIDE_SEGMENT_HEIGHT));
+
+    // 4) Remove previously generated dynamic segments
+    tvFrame.querySelectorAll('.frame-side[data-dyn="1"]').forEach(el => el.remove());
+
+    // 5) Add the exact number of new segments for BOTH sides.
+    for (let i = 0; i < extraSegments; i++) {
+      const topPos = SIDE_SEGMENT_START + i * SIDE_SEGMENT_HEIGHT;
+
+      const left = document.createElement('div');
+      left.className = 'frame-side left';
+      left.style.top = topPos + 'px';
+      left.setAttribute('data-dyn', '1');
+      tvFrame.appendChild(left);
+
+      const right = document.createElement('div');
+      right.className = 'frame-side right';
+      right.style.top = topPos + 'px';
+      right.setAttribute('data-dyn', '1');
+      tvFrame.appendChild(right);
+    }
+    // NOTE: We intentionally let these segments slip under bottom corners as requested.
+  }
+
+  // Run once on load
+  window.addEventListener('load', ensureFrameForContent);
+
+  // Re-run on resize (viewport width changes can reflow content)
+  window.addEventListener('resize', () => { requestAnimationFrame(ensureFrameForContent); });
+
+  // Observe content mutations inside tv-viewport AND tv-content
+  const mo = new MutationObserver(() => { requestAnimationFrame(ensureFrameForContent); });
+  mo.observe(tvViewport, { childList: true, subtree: true, characterData: true });
+  mo.observe(tvPetbot,  { childList: true, subtree: true, characterData: true });
+
+  // As a safety net, also observe size changes (both layers)
+  if (window.ResizeObserver) {
+    const ro = new ResizeObserver(() => { requestAnimationFrame(ensureFrameForContent); });
+    ro.observe(tvViewport);
+    ro.observe(tvPetbot);
+  }
+})();
+</script>
+
+
+<!-- === Script pro otevři/zavři petbot menu + rozmaž a znefunkčni vše pod ním === ------------------------------------------------------------------>
+<script>
+(() => {
+  const tvViewport = document.getElementById('tv-viewport');
+  const tvContent  = document.getElementById('tv-content');
+
+  const petArea   = document.getElementById('tv-petbot');
+  const petBtn    = petArea ? petArea.querySelector('.tab.petbot') : null;
+  const petPanel  = document.getElementById('pet-petbot-open');
+  const petClose  = petPanel ? petPanel.querySelector('.pet-close') : null;
+
+  if (!petArea || !petBtn || !petPanel || !petClose) return;
+
+  // --- start: panel skrytý ---
+  petPanel.style.display = 'none';
+  petPanel.setAttribute('aria-hidden', 'true');
+  petBtn.setAttribute('role', 'button');
+  petBtn.setAttribute('tabindex', '0');
+  petBtn.setAttribute('aria-expanded', 'false');
+  petBtn.setAttribute('aria-controls', 'pet-petbot-open');
+
+ function setBlur(active) {
+  if (tvViewport) tvViewport.classList.toggle('by-pet', active);
+  if (tvContent)  tvContent.classList.toggle('by-pet', active);
+}
+
+
+  function openPet() {
+    petBtn.style.display = 'none';
+    petPanel.style.display = 'flex';
+    petPanel.setAttribute('aria-hidden', 'false');
+    petBtn.setAttribute('aria-expanded', 'true');
+    setBlur(true);
+  }
+
+  function closePet() {
+    petPanel.style.display = 'none';
+    petPanel.setAttribute('aria-hidden', 'true');
+    petBtn.style.display = 'flex';
+    petBtn.setAttribute('aria-expanded', 'false');
+    setBlur(false);
+  }
+
+  function togglePet() {
+    const isHidden = petPanel.style.display === 'none';
+    isHidden ? openPet() : closePet();
+  }
+
+  petBtn.addEventListener('click', togglePet);
+  petBtn.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); togglePet(); }
+  });
+  petClose.addEventListener('click', closePet);
+})();
+</script>
+
+<script>
+// === VIEWPORT MODULE (script) ==----------------------------------------------------------------------------------------------------------------------------------------------= //
+// === VIEWPORT MODULE (script) ==----------------------------------------------------------------------------------------------------------------------------------------------= //
+// === VIEWPORT MODULE (script) ==----------------------------------------------------------------------------------------------------------------------------------------------= //
+// === VIEWPORT MODULE (script) ==----------------------------------------------------------------------------------------------------------------------------------------------= //
+
+(function(){
+  // DATA
+  const KEYS = [
+  'hq','zone','technology','mail','garage','account','events','clan',
+  'stats','profile','inventory','effects','travel','settings'
+];
+  const LABEL = {
+  hq:'HQ',
+  zone:'Lokace',
+  technology:'Technologie',
+  mail:'Pošta',
+  garage:'Garáž',
+  account:'Účet',
+  events:'Události',
+  clan:'Klan',
+  stats:'Statistiky',
+  profile:'Profil',
+  inventory:'Inventář',
+  effects:'Efekty',
+  travel:'Cestování',
+  settings:'Nastavení'
+};
+
+// STATE
+const state = {
+  top:{ stack:[] },
+  bottom:{ stack:[] },
+  extras:[ null, null, null, null ],
+  extrasEnabled:false,
+  extrasCapacity:0,
+};
+
+// === Storage (perzistence pinů + nastavení extras) ===
+const STORAGE_KEY = 'vp_pins_v1';
+
+function savePinsToStorage(){
+  const payload = {
+    extrasEnabled: state.extrasEnabled,
+    extrasCapacity: state.extrasCapacity,
+    bottom: Array.isArray(state.bottom.stack) ? state.bottom.stack : [],
+    extras: state.extras.map(s => (s && Array.isArray(s.stack)) ? s.stack : [])
+  };
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(payload)); } catch(e){}
+}
+
+function loadPinsFromStorage(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(!raw) return;
+    const data = JSON.parse(raw);
+
+    // nastavení extras
+    state.extrasEnabled = !!data.extrasEnabled;
+    state.extrasCapacity = Math.max(0, Math.min(4, data.extrasCapacity|0));
+
+    // piny
+    state.bottom = { stack: Array.isArray(data.bottom) ? data.bottom : [] };
+    state.extras = [null,null,null,null];
+    const arr = Array.isArray(data.extras) ? data.extras : [];
+    for(let i=0;i<Math.min(4, arr.length);i++){
+      const st = Array.isArray(arr[i]) ? arr[i] : [];
+      state.extras[i] = st.length ? { stack: st } : null;
+    }
+  }catch(e){}
+}
+
+
+
+// Abort controllery pro současné fetche (last-write-wins)
+const ctrls = {
+  top:    null,
+  bottom: null,
+  extras: [] // index = slot-2
+};
+
+  const activeCapacity = () => state.extrasEnabled ? state.extrasCapacity : 0;
+
+  // Elements
+const el = {
+  top: document.getElementById('menuTop'),
+  topWrap: document.getElementById('topWrap'),
+  bottom: document.getElementById('menuBottom'),
+  bottomWrap: document.getElementById('bottomWrap'),
+  topPh: document.getElementById('menuTopPlaceholder'),
+  extras: document.getElementById('extras'),
+};
+
+function controlsHTML(where) {
+  if (where === 'extra' || where === 'bottom') return '';  // žádné ovládací prvky uvnitř boxu
+
+  const closeAct = 'close-top';
+
+  // --- PIN BUTTON ---
+  let pinBtn = '';
+  const cap = activeCapacity();
+  if (cap === 0) {
+    pinBtn = `<button class="ctrl pin" data-act="pin-direct" title="Připnout do Pin 1">📌</button>`;
+  } else {
+   const items = Array.from({ length: cap + 1 }, (_, i) => {
+  const slot = i + 1;
+
+  // vyber stack pro daný slot
+  let stack;
+  if (slot === 1) {
+    stack = state.bottom.stack;
+  } else {
+    const idx = slot - 2;
+    stack = state.extras[idx]?.stack;
+  }
+
+  const busy = Array.isArray(stack) && stack.length > 0;
+
+  // název toho, co je v pinu (aktuální breadcrumb)
+  const name = busy ? stack.map(x => x.label).join(' / ') : '(volné)';
+
+  // výsledný text položky
+  const text = `Pin ${slot}: ${name}`;
+
+  return `<div class="item ${busy ? 'busy' : ''}" data-pin="${slot}">${text}</div>`;
+}).join('');
+
+    pinBtn = `
+      <div class="pin-dropdown">
+        <button class="ctrl pin" data-act="pin-open" title="Vyber slot">📌</button>
+        <div class="menu">${items}</div>
+      </div>`;
+  }
+
+  // --- CLOSE BUTTON jen pro TOP ---
+  const closeBtn = `<button class="ctrl" data-act="${closeAct}" title="Zavřít">X</button>`;
+  return `${pinBtn} ${closeBtn}`;
+}
+
+
+
+function boxHTML(content, where, breadcrumb, canGoBack) {
+  const backAttr = canGoBack ? '' : 'disabled';
+   return `
+    <div class="view-box" data-region="${where}">
+      <div class="view-head">
+        <div class="head-left">
+          <button class="back-btn" data-act="back" ${backAttr}>← Zpět</button>
+          <div class="view-title">${breadcrumb}</div>
+        </div>
+        <div class="head-right">
+          ${controlsHTML(where)}
+        </div>
+      </div>
+      <div class="view-body">
+        ${content}
+      </div>
+    </div>`;
+}
+
+// Renderers
+function renderTop(){
+  const stack = state.top.stack;
+  if(!stack || stack.length === 0){
+    el.top.classList.add('empty');
+    el.topWrap.innerHTML='';
+    el.top.style.display='none';
+    if(el.topPh) el.topPh.style.display='flex';
+    return;
+  }
+
+  const current = stack[stack.length-1];
+  const canGoBack = stack.length > 1;
+  el.top.classList.remove('empty');
+
+  // breadcrumb teď skládáme ze všech labelů
+  const breadcrumb = stack.map(x => x.label).join(" / ");
+
+  el.topWrap.innerHTML = boxHTML(current.content, 'top', breadcrumb, canGoBack);
+
+  el.top.style.display='block';
+  if(el.topPh) el.topPh.style.display='none';
+}
+
+function renderBottom() {
+  const stack = state.bottom.stack;
+  const has = Array.isArray(stack) && stack.length > 0;
+
+  if (has) {
+    const cur = stack[stack.length - 1];
+    const breadcrumb = stack.map(x => x.label).join(" / ");
+    const canGoBack = stack.length > 1;
+
+    el.bottom.classList.remove('empty');
+    el.bottom.style.display = 'block';
+
+    el.bottomWrap.innerHTML = `
+      <div class="extra" data-slot="1">
+        <div class="head">
+          <div class="title">Pin 1</div>
+          <button class="x" data-act="close-bottom" title="Zavřít">X</button>
+        </div>
+        <div class="body">
+          ${boxHTML(cur.content, 'bottom', breadcrumb, canGoBack)}
+        </div>
+      </div>`;
+    return;
+  }
+  el.bottom.classList.add('empty');
+  el.bottomWrap.innerHTML = '';
+  el.bottom.style.display = 'none';
+}
+
+
+  function rerender(){
+  renderTop();
+  renderBottom();
+  renderExtras();
+  savePinsToStorage(); // ← vždy po renderu uložit}
+  syncSettingsExtrasVal();
+
+  // Ulož i TOP stack (pro poslední session)
+  try {
+    localStorage.setItem('vp_top_stack', JSON.stringify(state.top.stack));
+  } catch(e){}
+}
+
+  // Extras
+function renderExtras(){
+  const cap = activeCapacity();
+  if (!el.extras) return;
+
+  let html = '';
+  for (let i = 0; i < cap; i++) {
+    const slot = i + 2;                      // Pin číslo: 2..(1+cap)
+    const st = state.extras[i]?.stack;
+
+    if (!Array.isArray(st) || st.length === 0) continue;
+
+    const cur = st[st.length - 1];
+    html += `
+      <div class="extra" data-slot="${slot}">
+        <div class="head">
+          <div class="title">Pin ${slot}</div>
+          <button class="x" data-act="close-extra" data-slot="${slot}" title="Zavřít">X</button>
+        </div>
+        <div class="body">
+          ${boxHTML(cur.content, 'extra', st.map(x => x.label).join(" / "), st.length > 1)}
+        </div>
+      </div>`;
+  }
+
+  el.extras.innerHTML = html;
+  el.extras.style.display = html ? 'flex' : 'none';
+}
+
+// ---- Settings (Extras) – helpery ----
+function extrasCountFromState(){
+  // zobrazená hodnota = 1..5 (1 = jen bottom)
+  return (state.extrasEnabled ? state.extrasCapacity : 0) + 1;
+}
+
+function applyExtrasCount(newCount){
+  // clamp 1..5
+  const n = Math.max(1, Math.min(5, newCount));
+
+  // mapování: 1 => enabled=false, cap=0; 2..5 => enabled=true, cap=n-1
+  if (n === 1) {
+    state.extrasEnabled  = false;
+    state.extrasCapacity = 0;
+  } else {
+    state.extrasEnabled  = true;
+    state.extrasCapacity = n - 1;  // 1..4
+  }
+
+  // zavři přebývající sloty
+  for (let i = state.extrasCapacity; i < 4; i++) state.extras[i] = null;
+
+  renderExtras();
+  rerender();     // uloží i do localStorage
+}
+
+function syncSettingsExtrasVal(){
+  const n = extrasCountFromState();
+  const val = String(n);
+
+  // přepiš číslo ve všech otevřených "Nastaveních"
+  document.querySelectorAll('[data-extras-val]').forEach(el => el.textContent = val);
+
+  // volitelně: disable šipky na hranách (1..5)
+  document.querySelectorAll('[data-extras-dec]').forEach(btn => btn.toggleAttribute('disabled', n <= 1));
+  document.querySelectorAll('[data-extras-inc]').forEach(btn => btn.toggleAttribute('disabled', n >= 5));
+}
+
+
+
+// === Load template (nová verze s label) ===
+async function loadTemplate(key, { signal } = {}) {
+  try {
+    const res = await fetch(`/menu/${key}.html`, { signal });
+    if (!res.ok) throw new Error("fetch fail");
+    const html = await res.text();
+
+    const wrapper = document.createElement("div");
+    wrapper.innerHTML = html.trim();
+    const root = wrapper.firstElementChild;
+
+    const label = root.getAttribute("data-vp-label") || key;
+    const watch = (root.getAttribute("data-vp-watch") || "")
+      .split(",").map(s => s.trim()).filter(Boolean);
+
+    return {
+      content: root.innerHTML,
+      label,
+      watch
+    };
+  } catch (e) {
+    return {
+      content: `<div class="error">Šablona není dostupná, zřejmě neběží testserver.</div>`,
+      label: key,
+      watch: []
+    };
+  }
+}
+
+
+
+// Core logic – otevření rootu
+async function openMenu(id) {
+  const ctrl = newController('top'); // zruší předchozí top fetch
+  const tpl = await loadTemplate(id, { signal: ctrl.signal });
+  if (ctrl.signal.aborted) return;   // LWW: starší požadavek ignoruj
+
+ state.top.stack = [{
+  id,
+  label: tpl.label,
+  content: tpl.content,
+  watch: tpl.watch
+}];
+  state.top.pinned = false;
+  rerender();
+}
+
+
+// === Fetch control (Abort + Last-Write-Wins) ===
+function newController(region, slotIdx = null) {
+  if (region === 'top') {
+    if (ctrls.top) ctrls.top.abort();
+    ctrls.top = new AbortController();
+    return ctrls.top;
+  }
+  if (region === 'bottom') {
+    if (ctrls.bottom) ctrls.bottom.abort();
+    ctrls.bottom = new AbortController();
+    return ctrls.bottom;
+  }
+  if (region === 'extra') {
+    const i = slotIdx ?? 0;
+    if (ctrls.extras[i]) ctrls.extras[i].abort();
+    ctrls.extras[i] = new AbortController();
+    return ctrls.extras[i];
+  }
+}
+
+// Refetch aktuálního view v regionu (pro watcher refresh)
+async function refetchCurrent(region, slot = null) {
+  let stack;
+  if (region === 'top') stack = state.top.stack;
+  else if (region === 'bottom') stack = state.bottom.stack;
+  else if (region === 'extra' && typeof slot === 'number' && slot >= 2) {
+    const idx = slot - 2;
+    stack = state.extras[idx]?.stack;
+  } else return;
+
+  if (!Array.isArray(stack) || stack.length === 0) return;
+  const cur = stack[stack.length - 1];
+
+  const ctrl = (region === 'extra')
+    ? newController('extra', (slot - 2))
+    : newController(region);
+
+  const tpl = await loadTemplate(cur.id, { signal: ctrl.signal });
+  if (ctrl.signal.aborted) return; // LWW: starší fetch byl zrušen
+
+  cur.label = tpl.label;
+  cur.content = tpl.content;
+  cur.watch = tpl.watch;
+
+  rerender();
+}
+
+
+// === Global handler for [data-open] (subview per region, Abort + LWW) ===
+document.body.addEventListener('click', async (e) => {
+  if (e.target.closest('[data-open-root]')) return;
+  const btn = e.target.closest('[data-open]');
+  if (!btn) return;
+  const subkey = btn.getAttribute('data-open');
+  if (!subkey) return;
+
+// Kde se kliklo? – čti region přímo z view-boxu
+let region = btn.closest('.view-box')?.getAttribute('data-region') || 'top';
+let extraSlot = 0, ctrl;
+
+// pokud je to extra, zjisti slot z nejbližšího .extra
+if (region === 'extra') {
+  const extraBox = btn.closest('.extra');
+  extraSlot = parseInt(extraBox?.getAttribute('data-slot') || '0', 10);
+}
+
+console.log("CLICK data-open", subkey, "region=", region, "slot=", extraSlot);
+
+
+  // Abort předchozího fetch v daném regionu
+  if (region === 'top') ctrl = newController('top');
+  else if (region === 'bottom') ctrl = newController('bottom');
+  else if (region === 'extra' && extraSlot >= 2) ctrl = newController('extra', extraSlot - 2);
+
+  const tpl = await loadTemplate(subkey, { signal: ctrl?.signal });
+  if (ctrl?.signal?.aborted) return; // LWW
+
+  const node = {
+  id: subkey,
+  label: tpl.label,
+  content: tpl.content,
+  watch: tpl.watch
+};
+
+  if (region === 'top') {
+    state.top.stack.push(node);
+  } else if (region === 'bottom') {
+    if (!Array.isArray(state.bottom.stack)) state.bottom.stack = [];
+    state.bottom.stack.push(node);
+    console.log('BOTTOM stack now:', state.bottom.stack.map(n => n.id));
+  } else if (region === 'extra' && extraSlot >= 2) {
+    const idx = extraSlot - 2;
+    if (!state.extras[idx]) state.extras[idx] = { stack: [] };
+    if (!Array.isArray(state.extras[idx].stack)) state.extras[idx].stack = [];
+    state.extras[idx].stack.push(node);
+  }
+
+  rerender();
+});
+
+
+// === Global handler for [data-open-root] (reset root per region; default = TOP) ===
+document.addEventListener('click', async (e) => {
+  const btn = e.target.closest('[data-open-root]');
+  if (!btn) return;
+
+  e.preventDefault();
+  e.stopPropagation();
+
+  const rootkey = btn.getAttribute('data-open-root');
+  if (!rootkey) return;
+
+  // zjisti region z nejbližšího view-boxu
+  const region = btn.closest('.view-box')?.getAttribute('data-region') || 'top';
+
+  if (region === 'bottom') {
+    const ctrl = newController('bottom');
+    const tpl = await loadTemplate(rootkey, { signal: ctrl.signal });
+    if (ctrl.signal.aborted) return;
+    state.bottom.stack = [{ id: rootkey, label: tpl.label, content: tpl.content, watch: tpl.watch }];
+    rerender();
+    return;
+  }
+
+  if (region === 'extra') {
+    const extraBox = btn.closest('.extra');
+    const slot = parseInt(extraBox?.getAttribute('data-slot') || '0', 10);
+    if (slot >= 2) {
+      const idx  = slot - 2;
+      const ctrl = newController('extra', idx);
+      const tpl  = await loadTemplate(rootkey, { signal: ctrl.signal });
+      if (ctrl.signal.aborted) return;
+      state.extras[idx] = { stack: [{ id: rootkey, label: tpl.label, content: tpl.content, watch: tpl.watch }]};
+      rerender();
+      return;
+    }
+  }
+ 
+});
+
+// === SETTINGS: extras count – GLOBÁLNĚ (funguje v top/bottom/extra) ===
+document.addEventListener('click', (e) => {
+  if (e.target.closest('[data-extras-dec]')) {
+    e.preventDefault(); e.stopPropagation();
+    applyExtrasCount(extrasCountFromState() - 1);
+  } else if (e.target.closest('[data-extras-inc]')) {
+    e.preventDefault(); e.stopPropagation();
+    applyExtrasCount(extrasCountFromState() + 1);
+  }
+});
+
+
+// === Back navigation ===
+function topBack() {
+  if (!state.top.stack || state.top.stack.length <= 1) return; // root → nic
+  state.top.stack.pop(); // odeber aktuální view
+  rerender();
+}
+
+function bottomBack(){
+  const st = state.bottom.stack;
+  if (!Array.isArray(st) || st.length <= 1) return;
+  st.pop();
+  rerender();
+}
+
+function extraBack(slot){
+  const idx = slot - 2;
+  const st = state.extras[idx]?.stack;
+  if (!Array.isArray(st) || st.length <= 1) return;
+  st.pop();
+  rerender();
+}
+
+function topClose(){
+  state.top.stack = [];   // vyprázdní stack → top se schová
+  rerender();
+}
+
+function bottomClose() {
+  state.bottom = { stack: [] };
+  rerender();
+}
+
+function pinToSlot(slot){
+  const src = state.top.stack;
+  if (!Array.isArray(src) || src.length === 0) return;
+
+  const cap = activeCapacity();      // 0..4 extras
+  const maxSlot = 1 + cap;           // 1 = bottom, 2..(1+cap) = extras
+  if (slot < 1 || slot > maxSlot) return;
+
+  // Deep copy stack (stačí mělká kopie objektů, data jsou primitivní)
+  const copy = src.map(x => ({
+  id: x.id,
+  label: x.label,
+  content: x.content,
+  watch: Array.isArray(x.watch) ? [...x.watch] : []
+}));
+
+
+  if (slot === 1) {
+    state.bottom = { stack: copy };
+  } else {
+    const idx = slot - 2;
+    state.extras[idx] = { stack: copy };
+  }
+
+  // TOP se NEMĚNÍ
+  rerender();
+}
+
+
+// Events
+// === TOP: ovladače + pin dropdown (overlay) ===
+el.top.addEventListener('click', async (e) => {
+  // ovládací tlačítka ve view-head
+
+  const actBtn = e.target.closest('[data-act]');
+  if (actBtn) {
+    const act = actBtn.getAttribute('data-act');
+
+    // ZPĚT
+    if (act === 'back') {
+      if (!actBtn.disabled) {
+        if (Array.isArray(state.top.stack) && state.top.stack.length > 1) {
+          state.top.stack.pop();
+          rerender();
+        }
+      }
+      return;
+    }
+
+    // ZAVŘÍT TOP
+    if (act === 'close-top') {
+      state.top.stack = [];
+      rerender();
+      return;
+    }
+
+    // OTEVŘÍT/ZAVŘÍT DROPDOWN (už žádné margin hacky)
+    if (act === 'pin-open') {
+      const dd = actBtn.closest('.pin-dropdown');
+      if (dd) dd.classList.toggle('open');
+      return;
+    }
+
+    // RYCHLÝ PIN DO PIN 1 (když není kapacita extras)
+    if (act === 'pin-direct') {
+      if (typeof pinToSlot === 'function') pinToSlot(1);
+      return;
+    }
+  }
+
+  // klik na položku v dropdownu (ponecháváme pouze v TOPU)
+  const pinItem = e.target.closest('.pin-dropdown .item');
+  if (pinItem) {
+    const slot = parseInt(pinItem.getAttribute('data-pin'), 10);
+    if (!Number.isNaN(slot) && typeof pinToSlot === 'function') {
+      pinToSlot(slot);
+    }
+    const dd = pinItem.closest('.pin-dropdown');
+    if (dd) dd.classList.remove('open');
+    return;
+  }
+});
+
+
+// --- Global handler: zavírá všechny pin-dropdown mimo klik ---
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('.pin-dropdown')) {
+    document.querySelectorAll('.pin-dropdown.open').forEach((dd) => {
+      dd.classList.remove('open');   // zavřít
+    });
+  }
+});
+
+// === BOTTOM: žádný pin dropdown uvnitř boxu (X je v wrapperu Pin 1) ===
+el.bottom.addEventListener('click', async (e) => {
+  const actBtn = e.target.closest('[data-act]');
+  if (!actBtn) return;
+
+  const act = actBtn.getAttribute('data-act');
+
+  // ZPĚT
+  if (act === 'back') {
+    if (Array.isArray(state.bottom.stack) && state.bottom.stack.length > 1) {
+      state.bottom.stack.pop();
+      rerender();
+    }
+    return;
+  }
+
+  // ZAVŘÍT BOTTOM (X v wrapperu "Pin 1")
+  if (act === 'close-bottom') {
+    state.bottom.stack = [];
+    rerender();
+    return;
+  }
+
+  // ⛔️ NIC dalšího: bottom NEMÁ pin dropdown ve view-head,
+  // takže tady nesmí být větve pro 'pin-open' ani pro '.pin-dropdown .item'.
+});
+
+
+  
+el.extras.addEventListener('click', (e) => {
+  const container = e.target.closest('.extra');
+  const slot = parseInt(container?.getAttribute('data-slot') || '0', 10);
+
+  const act  = e.target.closest('[data-act]')?.getAttribute('data-act');
+  if (act === 'close-extra') {
+    if (!isNaN(slot) && slot >= 2) {
+      state.extras[slot - 2] = null;
+      rerender();
+    }
+    return;
+  }
+  if (act === 'back') {
+    if (!isNaN(slot) && slot >= 2) {
+      const st = state.extras[slot - 2]?.stack;
+      const len = Array.isArray(st) ? st.length : 0;
+      if (len > 1) extraBack(slot);
+    }
+    return;
+  }
+});
+
+// === Watcher API (Orel) ===
+// Zavolej: ViewportAPI.emitChanged('mail-inbox') → refreshne se jen okna sledující tento scope
+window.ViewportAPI = {
+  emitChanged(scope) {
+    if (!scope) return;
+
+    // TOP
+    const t = state.top.stack;
+    if (Array.isArray(t) && t.length) {
+      const cur = t[t.length - 1];
+      if (Array.isArray(cur.watch) && cur.watch.includes(scope)) {
+        refetchCurrent('top');
+      }
+    }
+
+    // BOTTOM
+    const b = state.bottom.stack;
+    if (Array.isArray(b) && b.length) {
+      const cur = b[b.length - 1];
+      if (Array.isArray(cur.watch) && cur.watch.includes(scope)) {
+        refetchCurrent('bottom');
+      }
+    }
+
+    // EXTRAS
+    const cap = activeCapacity();
+    for (let i = 0; i < cap; i++) {
+      const st = state.extras[i]?.stack;
+      if (Array.isArray(st) && st.length) {
+        const cur = st[st.length - 1];
+        if (Array.isArray(cur.watch) && cur.watch.includes(scope)) {
+          refetchCurrent('extra', i + 2);
+        }
+      }
+    }
+  }
+};
+
+// Init
+loadPinsFromStorage();   // ← načti nastavení + piny
+renderExtras();          // ← vykresli piny (bottom + extras)
+const savedTop = localStorage.getItem('vp_top_stack');
+if (savedTop) {
+  try {
+    const stack = JSON.parse(savedTop);
+    if (Array.isArray(stack) && stack.length) {
+      state.top.stack = stack;
+      state.top.pinned = false;
+      rerender();
+    } else {
+      openMenu('hq');
+    }
+  } catch(e){
+    openMenu('hq');
+  }
+} else {
+  openMenu('hq');
+}
+
+// zveřejníme jen to, co potřebujeme
+window.VeralisVP = { openMenu };
+
+})();
+</script>
+
+<script>
+// Header/Badge: otevři root a zavři panely (capture-phase, aby to nepřebil modul)
+document.addEventListener('click', (e) => {
+  const el = e.target.closest('[data-open]');
+  if (!el) return;
+
+  // Handler běží jen MIMO viewport (tj. header/badge). Uvnitř .view-box necháváme modul.
+  if (el.closest('.view-box')) return;
+
+  e.preventDefault();
+  e.stopPropagation();
+  if (e.stopImmediatePropagation) e.stopImmediatePropagation();
+
+  const key = el.getAttribute('data-open');
+  if (!key) return;
+
+  // otevři root do TOP (reset stacku)
+  window.VeralisVP?.openMenu?.(key);
+
+  // zavři všechny tab panely + vypni blur
+  ['tab-home-open','tab-user-open','tab-world-open','tab-custom-open']
+    .forEach(id => document.getElementById(id)?.classList.remove('is-active'));
+
+  (document.getElementById('tv-viewport') || document.body)
+    .classList.remove('has-open');
+
+}, true); // capture-phase = proběhne dřív než modulový listener
+</script>
+
+
+<script>
+function setupTabButton(buttonId, menuKey) {
+  const btn = document.getElementById(buttonId);
+  if (!btn) return;
+
+  btn.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.stopImmediatePropagation) e.stopImmediatePropagation();
+
+    // otevři obsah
+    window.VeralisVP?.openMenu?.(menuKey);
+
+    // zavři panel, ve kterém je tohle tlačítko
+    const panel = btn.closest('.tab.menu.open.is-active');
+    if (panel) panel.classList.remove('is-active');
+
+    // vypni blur
+    const vp = document.getElementById('tv-viewport') || document.getElementById('tv-content') || document.body;
+    vp.classList.remove('has-open');
+  });
+}
+
+// --- Home ---
+setupTabButton('tab1menu1', 'hq');
+setupTabButton('tab1menu2', 'garage');
+setupTabButton('tab1menu3', 'zone');
+setupTabButton('tab1menu4', 'technology');
+
+// --- User ---
+setupTabButton('tab2menu1', 'profile');
+setupTabButton('tab2menu2', 'inventory');
+setupTabButton('tab2menu3', 'effects');
+setupTabButton('tab2menu4', 'travel');
+
+// --- World ---
+setupTabButton('tab3menu1', 'events');
+setupTabButton('tab3menu2', 'mail');
+setupTabButton('tab3menu3', 'stats');
+setupTabButton('tab3menu4', 'clan');
+</script>
+</body>
+</html>

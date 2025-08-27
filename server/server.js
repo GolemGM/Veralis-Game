@@ -1,22 +1,43 @@
+// server/server.js
 const express = require('express');
 const path = require('path');
+const compression = require('compression');
+const helmet = require('helmet');
+
 const app = express();
-const PORT = 3000;
+app.disable('x-powered-by');
+app.set('trust proxy', true);
 
-app.use(express.static(__dirname));
+app.use(helmet({ contentSecurityPolicy: false }));
+app.use(compression());
+app.use(express.json({ limit: '200kb' }));
 
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, '26-08-20-09game.html'));
+// Statické soubory servírujeme z ROOTU repa (o úroveň výš než /server)
+const ROOT = path.resolve(__dirname, '..');
+
+app.use(express.static(ROOT, {
+  index: false,
+  etag: true,
+  maxAge: '1h',
+}));
+
+// Přímé routy na hlavní stránky
+app.get(['/game', '/game.html'], (req, res) => {
+  res.sendFile(path.join(ROOT, 'game.html'));
 });
 
-// dnešní test: /menu/:key -> ./menu/<key>.html
-app.get('/menu/:key', (req, res) => {
-  res.sendFile(path.join(__dirname, 'menu', req.params.key + '.html'));
+app.get(['/starbridge', '/StarBridge', '/StarBridge.html'], (req, res) => {
+  res.sendFile(path.join(ROOT, 'StarBridge.html'));
 });
 
-// budoucí alias jako v produkci
-app.get('/ui/menu/:key', (req, res) => {
-  res.sendFile(path.join(__dirname, 'menu', req.params.key + '.html'));
-});
+// Pokud nemáš index.html, pošli uživatele na /game
+app.get('/', (req, res) => res.redirect('/game'));
 
-app.listen(PORT, () => console.log(`Server běží na http://localhost:${PORT}`));
+app.get('/health', (_req, res) => res.json({ ok: true }));
+
+const PORT = process.env.PORT || 8080;
+app.listen(PORT, () => {
+  console.log(`Dev server běží na http://localhost:${PORT}`);
+  console.log(`→ /game        (game.html)`);
+  console.log(`→ /StarBridge  (StarBridge.html)`);
+});

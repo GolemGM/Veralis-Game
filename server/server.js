@@ -108,6 +108,64 @@ app.post("/api/character/cc-complete", async (req, res) => {
   }
 });
 
+// ------------------ Character Creation API ------------------
+
+// CREATE – vytvořit postavu
+app.post("/api/character/create", async (req, res) => {
+  const { name } = req.body;
+  if (!name || !name.trim()) return res.json({ error: "invalid" });
+
+  try {
+    const result = await pool.query(
+      "INSERT INTO characters (name, stage, book_visited) VALUES ($1, 1, false) RETURNING id",
+      [name.trim()]
+    );
+    res.json({ status: "ok", id: result.rows[0].id });
+  } catch (err) {
+    if (err.code === "23505") return res.json({ error: "exists" }); // duplicitní jméno
+    console.error(err);
+    res.json({ error: "db" });
+  }
+});
+
+// STATUS – vrátí stage a bookVisited
+app.get("/api/character/status", async (req, res) => {
+  try {
+    const result = await pool.query(
+      "SELECT stage, book_visited FROM characters ORDER BY id DESC LIMIT 1"
+    );
+    if (result.rows.length === 0) return res.json({ cc_stage: 0 });
+    const row = result.rows[0];
+    res.json({ cc_stage: row.stage, book_visited: row.book_visited });
+  } catch (err) {
+    console.error(err);
+    res.json({ cc_stage: 0 });
+  }
+});
+
+// BOOK – nastavit že kniha byla přečtena
+app.post("/api/character/book-visited", async (req, res) => {
+  try {
+    await pool.query("UPDATE characters SET book_visited=true WHERE id=(SELECT id FROM characters ORDER BY id DESC LIMIT 1)");
+    res.json({ ok: true });
+  } catch (err) {
+    console.error(err);
+    res.json({ ok: false });
+  }
+});
+
+// COMPLETE – ukončit CC a jít do hry
+app.post("/api/character/cc-complete", async (_req, res) => {
+  try {
+    await pool.query("UPDATE characters SET stage=2 WHERE id=(SELECT id FROM characters ORDER BY id DESC LIMIT 1)");
+    res.json({ redirect: "/game.html" });
+  } catch (err) {
+    console.error(err);
+    res.json({ redirect: "/game.html" });
+  }
+});
+
+
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {
   console.log(`Dev server běží na http://localhost:${PORT}`);
@@ -121,5 +179,6 @@ pool.connect()
   })
   .catch(err => console.error("❌ DB connection error:", err));  
 });
+
 
 

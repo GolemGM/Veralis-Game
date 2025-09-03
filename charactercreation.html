@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="cs" id="html-el">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Veralis – Character Creation</title>
+  <link rel="stylesheet" href="css/cc.css" />
+  </head>
+<body>
+  
+  <main id="cc-root">
+    <!-- 1) Scéna stůl s mapami -->
+    <div id="cc-table" class="cc-scene">
+      <img
+        src="images/bg_with_stamps.jpg"
+        alt="Stůl se známkami"
+        usemap="#map-with-stamps"
+        id="cc-bg"
+        width="1600" height="900"
+        style="display:block;"
+      />
+
+      <!-- mapa se známkami (stage 0) -->
+      <map name="map-with-stamps">
+        <area id="zone-tags" shape="poly"
+          coords="582,865,611,834,616,803,575,769,549,745,620,763,655,753,676,732,703,681,722,636,711,608,489,550,465,553,441,568,431,503,420,459,386,431,351,421,310,417,275,418,242,433,211,450,200,467,200,482,212,492,248,502,282,513,307,541,314,554,328,570,339,580,375,604,388,613,358,635,338,662,331,687,334,715,332,743,318,783,313,817,330,848,368,878,403,890,440,882,468,868,495,890,529,888,560,879"
+          href="#" alt="tags" title="tags" />
+      </map>
+
+      <!-- mapa bez známek (stage 1) -->
+      <map name="map-without-stamps">
+        <!-- zápisník -->
+        <area id="zone-book" shape="poly"
+          coords="1264,854,995,732,981,718,986,664,1300,383,1318,382,1346,383,1599,462,1599,588,1386,879,1341,882"
+          href="#" alt="book" title="book"/>
+        <!-- hrnek – na startu zamčený (bez href,title) -->
+        <area id="zone-cup" shape="poly"
+          coords="794,71,793,332,801,370,835,416,889,447,961,461,1033,458,1094,443,1146,416,1181,365,1238,359,1293,327,1324,279,1335,235,1339,195,1328,143,1297,112,1260,105,1233,106,1207,113,1205,75,1184,47,1132,21,1070,6,1015,3,918,7,866,19,824,37"
+          alt="cup" title=""/>
+      </map>
+    </div>
+
+    <!-- 2) Modal -->
+    <div id="cc-modal" class="cc-modal hidden">
+      <img src="images/cc_modal.png" alt="Dialog panel" class="cc-modal-frame"/>
+      <div class="cc-modal-content">
+        <h2 class="lang" data-key="enter_name"></h2>
+        <p id="modal-instructions" class="lang" data-key="name_hint"></p>
+        <input id="name-input" type="text" maxlength="30"/>
+        <p id="modal-feedback"></p>
+        <button id="modal-confirm" class="lang" data-key="confirm"></button>
+        <button id="modal-cancel"  class="lang" data-key="close"></button>
+      </div>
+    </div>
+
+    <!-- 3) Otevřený zápisník -->
+  <div id="cc-book" class="hidden">
+  <img src="images/cc_notebook.png" alt="Zápisník"/>
+
+<!-- Klikací rohy (listování) -->
+<div id="book-zones">
+  <div id="zone-turn-left"  class="zone" title="Listovat zpět"></div>
+  <div id="zone-turn-right" class="zone" title="Listovat vpřed"></div>
+</div>
+
+<!-- Textové plochy -->
+<div class="cc-page cc-left">
+  <div class="lang" data-key="lore_page1"></div>
+</div>
+<div class="cc-page cc-right">
+  <div class="lang" data-key="lore_page2"></div>
+</div>
+
+<!-- Záložka (zavřít) -->
+<div id="bookmark" title="Zavřít zápisník"></div>
+</div> <!-- ✅ konec #cc-book -->
+
+<!-- Overlay blokuje kliky při otevřeném modalu/knize -->
+<div id="cc-overlay" class="hidden"></div>
+
+  </main>
+
+    <!-- LANG (stávající loader; jen si z něj cc.js bere texty) -->
+  <script src="js/lang.js"></script>
+
+  <!-- CC JS -->
+  <script src="js/cc.js"></script>
+</body>
+</html>

@@ -1,4 +1,20 @@
-    /* ---------- Jazyk ---------- */
+// === Backend API base (Railway) ===
+const API_BASE = "https://veralis-backend-production.up.railway.app";
+
+// Lehký wrapper, ať nepíšeme pořád celé URL
+function api(path, init = {}) {
+  const headers = init.headers ? { ...init.headers } : {};
+  if (init.body && !headers["Content-Type"]) headers["Content-Type"] = "application/json";
+
+  // Pokud máš token (stejně jako ve StarBridge), přibalíme ho.
+  const token = localStorage.getItem("token");
+  if (token) headers["Authorization"] = `Bearer ${token}`;
+
+  // credentials: "include" je bezpečné – když budeš chtít posílat cookies
+  return fetch(`${API_BASE}${path}`, { ...init, headers, credentials: "include" });
+}
+
+/* ---------- Jazyk ---------- */
     function setLanguage(lang) {
       document.querySelectorAll('.lang').forEach(el => {
         const key = el.dataset.key;
@@ -193,41 +209,23 @@ function openModal(type){
 function closeBook() {
   ccBook.classList.add("hidden");
   document.body.classList.remove("blurred");
-  document.getElementById("cc-overlay").classList.add("hidden"); // ⬅️ přidáno
+  document.getElementById("cc-overlay").classList.add("hidden");
   bookVisited = true;
   localStorage.setItem("ccBookVisited", "true");
   enableCup();
 
-  fetch("/api/character/book-visited", {
+  api("/api/character/book-visited", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ visited: true })
-  }).catch(()=>{});
+  }).catch(() => {});
 }
 
+function enableCup() {
+  zoneCup.setAttribute("href", "#");
+  zoneCup.setAttribute("title", "cup");
+}
 
-    function enableCup(){
-      zoneCup.setAttribute("href", "#");
-      zoneCup.setAttribute("title", "cup");
-    }
-
-// --- Stránkování obsahu v zápisníku (lang.js texty) ---
 let pageIndex = 0;
-
-function renderBookPages() {
-  const left  = document.querySelector(".cc-page.cc-left");
-  const right = document.querySelector(".cc-page.cc-right");
-
-  // klíče v lang.js: lore_page1, lore_page2, lore_page3...
-  const leftKey  = "lore_page" + (pageIndex*2 + 1);
-  const rightKey = "lore_page" + (pageIndex*2 + 2);
-
-  left.innerHTML  = translations[currentLang][leftKey]  || "";
-  right.innerHTML = translations[currentLang][rightKey] || "";
-}
-
-// první vykreslení po otevření knihy
-renderBookPages();
 
 // spočítá nejvyšší dostupný index dvojstrany podle klíčů lore_pageN v translations
 function getLastSpreadIndex() {
@@ -291,10 +289,12 @@ bookmark.addEventListener("click", closeBook);
         if (!val) { modalFeedback.textContent = translations[currentLang].name_hint; modalFeedback.style.color="#ff6868"; return; }
 
         try {
-          const res = await fetch("/api/character/create",{
-            method:"POST", headers:{ "Content-Type":"application/json" }, body:JSON.stringify({ name:val })
-          });
-          const data = await res.json();
+const res = await api("/api/character/create", {
+  method: "POST",
+  body: JSON.stringify({ name: val })
+});
+const data = await res.json();
+            
           if (data.error === "exists") {
             modalFeedback.textContent = translations[currentLang].name_exists; modalFeedback.style.color="#ff6868";
 } else if (data.status === "ok") {
@@ -315,7 +315,10 @@ bookmark.addEventListener("click", closeBook);
         }
       } else {
         // leave
-        const res = await fetch("/api/character/cc-complete",{ method:"POST", headers:{ "Content-Type":"application/json" }, body:JSON.stringify({}) });
+        const res = await api("/api/character/cc-complete", {
+  method: "POST",
+  body: JSON.stringify({})
+});
         const data = await res.json();
         if (data.redirect) window.location.href = data.redirect;
       }
@@ -324,7 +327,7 @@ bookmark.addEventListener("click", closeBook);
 
 (async function initCc(){
   try {
-    const r = await fetch("/api/character/status");
+    const r = await api("/api/character/status");
     const s = await r.json();
     if (typeof s.cc_stage === "number") {
       localStorage.setItem("ccStage", String(s.cc_stage));

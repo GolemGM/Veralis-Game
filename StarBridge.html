@@ -75,11 +75,12 @@
     const enterBtn = document.querySelector(".enter-btn");
     const exitBtn = document.querySelector(".exit-btn");
 
-    if (enterBtn) {
-      enterBtn.addEventListener("click", () => {
-        window.location.href = "https://golemgm.github.io/Veralis-Promo/demogame.html";
-      });
-    }
+if (enterBtn) {
+  enterBtn.addEventListener("click", () => {
+    const langParam = new URLSearchParams(window.location.search).get("lang") || "en";
+    window.location.href = `/enter?lang=${langParam}`;
+  });
+}
 
     if (exitBtn) {
       exitBtn.addEventListener("click", () => {

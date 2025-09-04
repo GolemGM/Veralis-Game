@@ -42,126 +42,100 @@ app.get('/', (req, res) => res.redirect('/game'));
 
 app.get('/health', (_req, res) => res.json({ ok: true }));
 
-// ---------------- Character Creation API ----------------
+// ------------------ Character Creation API (final) ------------------
 
-// Status hráče
-app.get("/api/character/status", async (req, res) => {
+// CREATE – vytvořit postavu (case-insensitive unikátnost)
+app.post("/api/character/create", async (req, res) => {
+  const { name } = req.body;
+  if (!name || !name.trim()) return res.json({ error: "invalid" });
+
   try {
-    const result = await pool.query("SELECT name, stage, book_visited FROM characters LIMIT 1");
-    if (result.rows.length === 0) {
-      return res.json({ cc_stage: 0 });
-    }
-    const row = result.rows[0];
+    // kolize jména (LOWER)
+    const exists = await pool.query(
+      "SELECT 1 FROM characters WHERE LOWER(name) = LOWER($1) LIMIT 1",
+      [name.trim()]
+    );
+    if (exists.rows.length) return res.json({ error: "exists" });
+
+    await pool.query(
+      "INSERT INTO characters (name, stage, book_visited) VALUES ($1, 1, false)",
+      [name.trim()]
+    );
+    return res.json({ status: "ok" });
+  } catch (err) {
+    console.error(err);
+    return res.json({ error: "db" });
+  }
+});
+
+// STATUS – poslední záznam (dokud neřešíme player_id)
+app.get("/api/character/status", async (_req, res) => {
+  try {
+    const r = await pool.query(
+      "SELECT name, stage, book_visited FROM characters ORDER BY id DESC LIMIT 1"
+    );
+    if (!r.rows.length) return res.json({ cc_stage: 0 });
+    const row = r.rows[0];
     return res.json({
       cc_stage: row.stage,
       book_visited: row.book_visited,
       name: row.name
     });
   } catch (err) {
-    console.error("status error", err);
-    res.json({ cc_stage: 0 });
+    console.error(err);
+    return res.json({ cc_stage: 0 });
   }
 });
 
-// Vytvoření postavy
-app.post("/api/character/create", async (req, res) => {
-  const { name } = req.body;
-  if (!name) return res.json({ error: "invalid" });
-
+// BOOK – označit, že hráč knihu zavřel
+app.post("/api/character/book-visited", async (_req, res) => {
   try {
-    // unikátní jméno
-    const exists = await pool.query("SELECT id FROM characters WHERE LOWER(name) = LOWER($1)", [name]);
-    if (exists.rows.length > 0) {
-      return res.json({ error: "exists" });
-    }
-
     await pool.query(
-      "INSERT INTO characters (name, stage, book_visited) VALUES ($1, 1, false)",
-      [name]
+      "UPDATE characters SET book_visited = true WHERE id=(SELECT id FROM characters ORDER BY id DESC LIMIT 1)"
     );
-    return res.json({ status: "ok" });
-  } catch (err) {
-    console.error("create error", err);
-    res.json({ error: "db" });
-  }
-});
-
-// Označení že hráč otevřel knihu
-app.post("/api/character/book-visited", async (req, res) => {
-  try {
-    await pool.query("UPDATE characters SET book_visited = true WHERE stage = 1");
-    res.json({ ok: true });
-  } catch (err) {
-    console.error("book error", err);
-    res.json({ error: "db" });
-  }
-});
-
-// Dokončení CC
-app.post("/api/character/cc-complete", async (req, res) => {
-  try {
-    await pool.query("UPDATE characters SET stage = 2 WHERE stage = 1");
-    res.json({ redirect: "/game.html" });
-  } catch (err) {
-    console.error("cc-complete error", err);
-    res.json({ error: "db" });
-  }
-});
-
-// ------------------ Character Creation API ------------------
-
-// CREATE – vytvořit postavu
-app.post("/api/character/create", async (req, res) => {
-  const { name } = req.body;
-  if (!name || !name.trim()) return res.json({ error: "invalid" });
-
-  try {
-    const result = await pool.query(
-      "INSERT INTO characters (name, stage, book_visited) VALUES ($1, 1, false) RETURNING id",
-      [name.trim()]
-    );
-    res.json({ status: "ok", id: result.rows[0].id });
-  } catch (err) {
-    if (err.code === "23505") return res.json({ error: "exists" }); // duplicitní jméno
-    console.error(err);
-    res.json({ error: "db" });
-  }
-});
-
-// STATUS – vrátí stage a bookVisited
-app.get("/api/character/status", async (req, res) => {
-  try {
-    const result = await pool.query(
-      "SELECT stage, book_visited FROM characters ORDER BY id DESC LIMIT 1"
-    );
-    if (result.rows.length === 0) return res.json({ cc_stage: 0 });
-    const row = result.rows[0];
-    res.json({ cc_stage: row.stage, book_visited: row.book_visited });
+    return res.json({ ok: true });
   } catch (err) {
     console.error(err);
-    res.json({ cc_stage: 0 });
+    return res.json({ ok: false });
   }
 });
 
-// BOOK – nastavit že kniha byla přečtena
-app.post("/api/character/book-visited", async (req, res) => {
-  try {
-    await pool.query("UPDATE characters SET book_visited=true WHERE id=(SELECT id FROM characters ORDER BY id DESC LIMIT 1)");
-    res.json({ ok: true });
-  } catch (err) {
-    console.error(err);
-    res.json({ ok: false });
-  }
-});
-
-// COMPLETE – ukončit CC a jít do hry
+// COMPLETE – ukončit CC a poslat do hry
 app.post("/api/character/cc-complete", async (_req, res) => {
   try {
-    await pool.query("UPDATE characters SET stage=2 WHERE id=(SELECT id FROM characters ORDER BY id DESC LIMIT 1)");
-    res.json({ redirect: "/game.html" });
+    await pool.query(
+      "UPDATE characters SET stage = 2 WHERE id=(SELECT id FROM characters ORDER BY id DESC LIMIT 1)"
+    );
+    return res.json({ redirect: "/game.html" });
   } catch (err) {
     console.error(err);
-    res.json({ redirect: "/game.html" });
+    return res.json({ redirect: "/game.html" });
+  }
+});
+
+// Rozhodnutí při vstupu do hry (ze StarBridge)
+app.get(['/enter', '/enter-game'], async (_req, res) => {
+  try {
+    const r = await pool.query("SELECT stage FROM characters ORDER BY id DESC LIMIT 1");
+    const stage = r.rows[0]?.stage ?? 0;
+    if (stage < 2) return res.redirect('/charactercreation.html');
+    return res.redirect('/game.html');
+  } catch (err) {
+    console.error(err);
+    return res.redirect('/charactercreation.html');
+  }
+});
+
+// Guard pro přímý přístup na CC – hotový hráč už CC neuvidí
+app.get('/charactercreation.html', async (req, res, next) => {
+  try {
+    const r = await pool.query("SELECT stage FROM characters ORDER BY id DESC LIMIT 1");
+    const stage = r.rows[0]?.stage ?? 0;
+    if (stage >= 2) return res.redirect('/game.html');
+    return res.sendFile(path.join(ROOT, 'charactercreation.html'));
+  } catch (err) {
+    console.error(err);
+    return res.sendFile(path.join(ROOT, 'charactercreation.html'));
   }
 });
 
@@ -179,6 +153,7 @@ pool.connect()
   })
   .catch(err => console.error("❌ DB connection error:", err));  
 });
+
 
 
 

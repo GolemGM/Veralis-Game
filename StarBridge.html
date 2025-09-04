@@ -95,6 +95,24 @@ if (enterBtn) {
   });
 </script>
 
+<script>
+async function enterGame() {
+  try {
+    const r = await fetch('/api/character/status');
+    const s = await r.json();
+    if (s.cc_stage >= 2) {
+      window.location.href = '/game';
+    } else {
+      window.location.href = '/character-creation';
+    }
+  } catch {
+    // na chybu raději povést do CC, ať hráč projde vytvoření
+    window.location.href = '/character-creation';
+  }
+}
+</script>
+
+  <button onclick="enterGame()">Enter Game</button>
 
 </body>
 </html>

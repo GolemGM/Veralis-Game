@@ -91,7 +91,7 @@ function applyStage(stage) {
     }
 
   } else if (ccStage >= 2) {
-    window.location.href = "/tutorial";
+    window.location.href = "/game.html";
   }
 }
 

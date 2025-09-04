@@ -12,21 +12,31 @@
   <script defer src="js/events.js"></script>
   <script defer src="js/devlogs.js"></script>
 
+  <script>
+  function getLang() {
+    return new URLSearchParams(location.search).get('lang')
+      || document.documentElement.lang
+      || 'cs';
+  }
+  // srovnej <html lang> podle URL
+  document.documentElement.lang = getLang();
+</script>
+
   <!-- Script ovladani jazyka -->
   
   <script>
-    const langParam = new URLSearchParams(window.location.search).get("lang");
-    const currentLang = langParam === "cs" ? "cs" : "en";
+  const currentLang = getLang();
+  const token = localStorage.getItem('token');
+  if (!token) {
+    const loginTarget = currentLang === 'cs'
+      ? 'https://golemgm.github.io/Veralis-Promo/login.html'
+      : 'https://golemgm.github.io/Veralis-Promo/en/login.html';
+    location.href = loginTarget;
+  }
+  // Pokud chceš, můžeš tu zůstat i u loadLanguage(currentLang);
+  if (typeof loadLanguage === 'function') loadLanguage(currentLang);
+</script>
 
-    const token = localStorage.getItem("token");
-    if (!token) {
-      window.location.href = `login.html?lang=${currentLang}`;
-    }
-
-    if (typeof loadLanguage === "function") {
-      loadLanguage(currentLang);
-    }
-  </script>
   
 </head>
 <body>
@@ -71,48 +81,55 @@
   <!-- Script ovladani Enter Exit -->
   
 <script>
-  document.addEventListener("DOMContentLoaded", () => {
-    const enterBtn = document.querySelector(".enter-btn");
-    const exitBtn = document.querySelector(".exit-btn");
+  document.addEventListener('DOMContentLoaded', () => {
+    const enterBtn = document.querySelector('.enter-btn');
+    const exitBtn  = document.querySelector('.exit-btn');
 
-if (enterBtn) {
-  enterBtn.addEventListener("click", () => {
-    const langParam = new URLSearchParams(window.location.search).get("lang") || "en";
-    window.location.href = `/enter?lang=${langParam}`;
-  });
-}
-
-    if (exitBtn) {
-      exitBtn.addEventListener("click", () => {
-        localStorage.removeItem("token");
-        const langParam = new URLSearchParams(window.location.search).get("lang") || "en";
-        const loginTarget = langParam === "cs"
-          ? "https://golemgm.github.io/Veralis-Promo/login.html"
-          : "https://golemgm.github.io/Veralis-Promo/en/login.html";
-        window.location.href = loginTarget;
+    // Enter → vždy voláme enterGame() (viz další script níže)
+    if (enterBtn) {
+      enterBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        enterGame();
       });
     }
+
+    // Exit – jen vyčistit token a jít na správný login podle jazyka
+    if (exitBtn) {
+      exitBtn.addEventListener('click', () => {
+        localStorage.removeItem('token');
+        const lang = getLang();
+        const loginTarget = lang === 'cs'
+          ? 'https://golemgm.github.io/Veralis-Promo/login.html'
+          : 'https://golemgm.github.io/Veralis-Promo/en/login.html';
+        location.href = loginTarget;
+      });
+    }
+
+    // (volitelné) pokud tvůj js/lang.js exportuje loadLanguage
+    if (typeof loadLanguage === 'function') loadLanguage(getLang());
   });
 </script>
-
 <script>
-async function enterGame() {
-  try {
-    const r = await fetch('/api/character/status');
-    const s = await r.json();
-    if (s.cc_stage >= 2) {
-      window.location.href = '/game';
-    } else {
-      window.location.href = '/character-creation';
+  async function enterGame() {
+    const lang = getLang();
+
+    try {
+      const r = await fetch('/api/character/status', { credentials: 'include' });
+      const s = await r.json();
+
+      if (s && typeof s.cc_stage === 'number' && s.cc_stage >= 2) {
+        // hotovo → rovnou do hry
+        location.href = `game.html?lang=${lang}`;
+      } else {
+        // potřebuje projít CC (změň cílovou cestu, pokud máš serverovou route)
+        location.href = `charactercreation.html?lang=${lang}`;
+        // případně: location.href = `/character-creation?lang=${lang}`;
+      }
+    } catch (e) {
+      // na chybu raději do CC
+      location.href = `charactercreation.html?lang=${lang}`;
     }
-  } catch {
-    // na chybu raději povést do CC, ať hráč projde vytvoření
-    window.location.href = '/character-creation';
   }
-}
 </script>
-
-  <button onclick="enterGame()">Enter Game</button>
-
 </body>
 </html>

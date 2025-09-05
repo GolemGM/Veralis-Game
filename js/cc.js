@@ -6,82 +6,74 @@ function api(path, init = {}) {
   const headers = init.headers ? { ...init.headers } : {};
   if (init.body && !headers["Content-Type"]) headers["Content-Type"] = "application/json";
 
-  // Pokud máš token (stejně jako ve StarBridge), přibalíme ho.
   const token = localStorage.getItem("token");
   if (token) headers["Authorization"] = `Bearer ${token}`;
 
-  // credentials: "include" je bezpečné – když budeš chtít posílat cookies
-  return fetch(`${API_BASE}${path}`, { ...init, headers, credentials: "include" });
+  // ⚡ bez credentials – cookies teď nepotřebujeme
+  return fetch(`${API_BASE}${path}`, { ...init, headers });
 }
 
 /* ---------- Jazyk ---------- */
-    function setLanguage(lang) {
-      document.querySelectorAll('.lang').forEach(el => {
-        const key = el.dataset.key;
-        if (translations[lang] && translations[lang][key]) el.innerHTML = translations[lang][key];
-      });
-    }
+function setLanguage(lang) {
+  document.querySelectorAll('.lang').forEach(el => {
+    const key = el.dataset.key;
+    if (translations[lang] && translations[lang][key]) el.innerHTML = translations[lang][key];
+  });
+}
 
 function detectLang() {
-  // 1) ?lang=en|cs z URL (Starbridge by měl posílat ?lang=xx)
   const urlLang = new URLSearchParams(location.search).get("lang");
   if (urlLang && translations[urlLang]) return urlLang;
 
-  // 2) localStorage (volba hráče / minulé sezení)
   const saved = localStorage.getItem("lang");
   if (saved && translations[saved]) return saved;
 
-  // 3) navigator.* (pro 1. návštěvu bez ?lang)
   const nav = (navigator.language || navigator.userLanguage || "en").toLowerCase();
   if (nav.startsWith("cs")) return "cs";
   if (nav.startsWith("en")) return "en";
 
-  // 4) fallback
   return "cs";
 }
 
 let currentLang = detectLang();
-document.documentElement.setAttribute("lang", currentLang); // <html lang="…">
+document.documentElement.setAttribute("lang", currentLang);
 localStorage.setItem("lang", currentLang);
 setLanguage(currentLang);
 
+/* ---------- Elements ---------- */
+const ccTable = document.getElementById("cc-table");
+const ccBg    = document.getElementById("cc-bg");
+const zoneTags= document.getElementById("zone-tags");
+const zoneBook= document.getElementById("zone-book");
+const zoneCup = document.getElementById("zone-cup");
 
-    /* ---------- Elements ---------- */
-    const ccTable = document.getElementById("cc-table");
-    const ccBg    = document.getElementById("cc-bg");
-    const zoneTags= document.getElementById("zone-tags");
-    const zoneBook= document.getElementById("zone-book");
-    const zoneCup = document.getElementById("zone-cup");
+const ccModal = document.getElementById("cc-modal");
+const modalConfirm = document.getElementById("modal-confirm");
+const modalCancel  = document.getElementById("modal-cancel");
+const modalFeedback= document.getElementById("modal-feedback");
+const nameInput    = document.getElementById("name-input");
 
-    const ccModal = document.getElementById("cc-modal");
-    const modalConfirm = document.getElementById("modal-confirm");
-    const modalCancel  = document.getElementById("modal-cancel");
-    const modalFeedback= document.getElementById("modal-feedback");
-    const nameInput    = document.getElementById("name-input");
+const ccBook   = document.getElementById("cc-book");
+const bookmark = document.getElementById("bookmark");
+const zoneTurnLeft  = document.getElementById("zone-turn-left");
+const zoneTurnRight = document.getElementById("zone-turn-right");
+const leftBox  = document.querySelector(".cc-left");
+const rightBox = document.querySelector(".cc-right");
 
-    const ccBook   = document.getElementById("cc-book");
-    const bookmark = document.getElementById("bookmark");
-    // zóny a textové plochy v knize
-    const zoneTurnLeft  = document.getElementById("zone-turn-left");
-    const zoneTurnRight = document.getElementById("zone-turn-right");
-    const leftBox  = document.querySelector(".cc-left");
-    const rightBox = document.querySelector(".cc-right");
-
-// zapnout debug rámečky – až sedí geometrie, dej na false
 const BOOK_DEBUG = false;
 if (BOOK_DEBUG && ccBook) ccBook.classList.add("debug");
-    /* ---------- Stav hry (jen jednou!) ---------- */
-    let ccStage = 0;       // 0 = začátek, 1 = jméno OK, 2 = hotovo
-    let bookVisited = false;
 
-/* ---------- Stage aplikace + F5 ---------- */
+/* ---------- Stav hry ---------- */
+let ccStage = 0;       
+let bookVisited = false;
+
+/* ---------- Stage ---------- */
 function applyStage(stage) {
   ccStage = stage;
 
   if (ccStage === 0) {
     ccBg.src = "images/bg_with_stamps.jpg";
     ccBg.useMap = "#map-with-stamps";
-    // jistota: nic klikacího navíc
     zoneBook.removeAttribute("href");
     zoneBook.removeAttribute("title");
     zoneCup.removeAttribute("href");
@@ -91,15 +83,12 @@ function applyStage(stage) {
     ccBg.src = "images/bg_without_stamps.jpg";
     ccBg.useMap = "#map-without-stamps";
 
-    // kniha MUSÍ být aktivní
     zoneBook.setAttribute("href", "#");
     zoneBook.setAttribute("title", "book");
 
-    // hrnek zamknout, odemkne se po zavření knihy
     zoneCup.removeAttribute("href");
     zoneCup.removeAttribute("title");
 
-    // obnova po F5 – pokud už knihu někdy zavřel, odemkni hrnek hned
     bookVisited = JSON.parse(localStorage.getItem("ccBookVisited") || "false");
     if (bookVisited) {
       zoneCup.setAttribute("href", "#");
@@ -111,65 +100,59 @@ function applyStage(stage) {
   }
 }
 
+(function initCcLocal(){
+  const saved = parseInt(localStorage.getItem("ccStage") || "0", 10);
+  applyStage(saved);
+})();
 
-    (function initCcLocal(){
-      const saved = parseInt(localStorage.getItem("ccStage") || "0", 10);
-      applyStage(saved);
-    })();
+/* ---------- SVG záře ---------- */
+const svgns = "http://www.w3.org/2000/svg";
+const hoverSvg = document.createElementNS(svgns,"svg");
+hoverSvg.setAttribute("viewBox","0 0 1600 900");
+Object.assign(hoverSvg.style,{
+  position:"absolute", top:"0", left:"0", width:"100%", height:"100%",
+  pointerEvents:"none", zIndex:"5", display:"none"
+});
+const hoverPoly = document.createElementNS(svgns,"polygon");
+hoverPoly.setAttribute("fill","rgba(0,200,255,0.25)");
+hoverPoly.setAttribute("stroke","rgba(0,200,255,0.9)");
+hoverPoly.setAttribute("stroke-width","2");
+hoverSvg.appendChild(hoverPoly);
+ccTable.appendChild(hoverSvg);
 
-    /* ---------- SVG záře pro aktivní prvky ---------- */
-    const svgns = "http://www.w3.org/2000/svg";
-    const hoverSvg = document.createElementNS(svgns,"svg");
-    hoverSvg.setAttribute("viewBox","0 0 1600 900");
-    Object.assign(hoverSvg.style,{
-      position:"absolute", top:"0", left:"0", width:"100%", height:"100%",
-      pointerEvents:"none", zIndex:"5", display:"none"
-    });
-    const hoverPoly = document.createElementNS(svgns,"polygon");
-    hoverPoly.setAttribute("fill","rgba(0,200,255,0.25)");
-    hoverPoly.setAttribute("stroke","rgba(0,200,255,0.9)");
-    hoverPoly.setAttribute("stroke-width","2");
-    hoverSvg.appendChild(hoverPoly);
-    ccTable.appendChild(hoverSvg);
+function setHighlight(area){
+  if (!area) return;
+  if (area.id === "zone-cup" && !bookVisited) return;
+  const nums = area.coords.split(",").map(Number);
+  const pts = [];
+  for (let i=0;i<nums.length;i+=2) pts.push(`${nums[i]},${nums[i+1]}`);
+  hoverPoly.setAttribute("points", pts.join(" "));
+  hoverSvg.style.display = "block";
+}
+function clearHighlight(){ hoverSvg.style.display = "none"; }
 
-    function setHighlight(area){
-      if (!area) return;
-      if (area.id === "zone-cup" && !bookVisited) return; // hrnek zamčený = bez záře
-      const nums = area.coords.split(",").map(Number);
-      const pts = [];
-      for (let i=0;i<nums.length;i+=2) pts.push(`${nums[i]},${nums[i+1]}`);
-      hoverPoly.setAttribute("points", pts.join(" "));
-      hoverSvg.style.display = "block";
-    }
-    function clearHighlight(){ hoverSvg.style.display = "none"; }
-
-    // hover jen pro aktivní prvky
-    zoneTags.addEventListener("mouseenter", ()=> setHighlight(zoneTags));
-    zoneTags.addEventListener("mouseleave", clearHighlight);
-    zoneBook.addEventListener("mouseenter", ()=> setHighlight(zoneBook));
-    zoneBook.addEventListener("mouseleave", clearHighlight);
+zoneTags.addEventListener("mouseenter", ()=> setHighlight(zoneTags));
+zoneTags.addEventListener("mouseleave", clearHighlight);
+zoneBook.addEventListener("mouseenter", ()=> setHighlight(zoneBook));
+zoneBook.addEventListener("mouseleave", clearHighlight);
 zoneBook.addEventListener("click", (e)=>{ 
   e.preventDefault(); 
   e.stopPropagation(); 
   if (ccStage===1) openBook(); 
 });
-    zoneCup .addEventListener("mouseenter", ()=> setHighlight(zoneCup));
-    zoneCup .addEventListener("mouseleave", clearHighlight);
+zoneCup .addEventListener("mouseenter", ()=> setHighlight(zoneCup));
+zoneCup .addEventListener("mouseleave", clearHighlight);
 
-    /* ---------- Pomocné funkce ---------- */
+/* ---------- Modal ---------- */
 function openModal(type){
   ccModal.classList.remove("hidden");
   document.body.classList.add("blurred");
   modalFeedback.textContent = "";
-
-  // 🔧 pokaždé při otevření modalu zruš „zašednutí“ confirmu
   modalConfirm.disabled = false;
   modalConfirm.style.opacity = "";
 
   const heading = ccModal.querySelector("h2");
   const instr   = document.getElementById("modal-instructions");
-
-  // reset speciální pozice textu
   instr.classList.remove("in-slot");
 
   if (type === "name") {
@@ -187,24 +170,19 @@ function openModal(type){
     modalConfirm.dataset.action = "leave";
     modalConfirm.textContent = translations[currentLang]?.leave_confirm || "Odejít";
     modalCancel.textContent  = translations[currentLang]?.leave_cancel  || "Zůstat";
-
-    // 🔧 text instrukce dej do slotu (tam, kde bývá input)
     instr.classList.add("in-slot");
   }
 }
 
-
-
-
-    function closeModal(){ 
+function closeModal(){ 
   ccModal.classList.add("hidden"); 
   document.body.classList.remove("blurred"); 
-  document.getElementById("cc-overlay").classList.add("hidden"); // ⬅️ přidáno
+  document.getElementById("cc-overlay").classList.add("hidden");
 }
-    function openBook(){ 
+function openBook(){ 
   ccBook.classList.remove("hidden"); 
   document.body.classList.add("blurred"); 
-  document.getElementById("cc-overlay").classList.remove("hidden"); // ⬅️ přidáno
+  document.getElementById("cc-overlay").classList.remove("hidden");
 }
 function closeBook() {
   ccBook.classList.add("hidden");
@@ -214,10 +192,13 @@ function closeBook() {
   localStorage.setItem("ccBookVisited", "true");
   enableCup();
 
-  api("/api/character/book-visited", {
-    method: "POST",
-    body: JSON.stringify({ visited: true })
-  }).catch(() => {});
+  const charId = localStorage.getItem("ccId");
+  if (charId) {
+    api("/api/cc/notebook", {
+      method: "POST",
+      body: JSON.stringify({ charId })
+    }).catch(() => {});
+  }
 }
 
 function enableCup() {
@@ -227,12 +208,11 @@ function enableCup() {
 
 let pageIndex = 0;
 
-// spočítá nejvyšší dostupný index dvojstrany podle klíčů lore_pageN v translations
 function getLastSpreadIndex() {
   let i = 1;
   while (translations[currentLang]["lore_page" + i]) i++;
-  const lastPage = i - 1;             // poslední existující stránka
-  return Math.max(0, Math.ceil(lastPage / 2) - 1); // poslední dvojstrana (0-based)
+  const lastPage = i - 1;
+  return Math.max(0, Math.ceil(lastPage / 2) - 1);
 }
 
 function lockNav() {
@@ -248,7 +228,6 @@ function lockNav() {
   }
 }
 
-// Přepiš render tak, aby i zamykal navigaci:
 function renderBookPages() {
   const leftKey  = "lore_page" + (pageIndex*2 + 1);
   const rightKey = "lore_page" + (pageIndex*2 + 2);
@@ -258,7 +237,6 @@ function renderBookPages() {
 }
 renderBookPages();
 
-// Handlery na rohy jen mění index a překreslí:
 if (zoneTurnLeft)  zoneTurnLeft.addEventListener("click",  (e)=>{ 
   e.stopPropagation(); 
   if (pageIndex > 0) { pageIndex--; renderBookPages(); }
@@ -267,7 +245,6 @@ if (zoneTurnRight) zoneTurnRight.addEventListener("click", (e)=>{
   e.stopPropagation(); 
   if (pageIndex < getLastSpreadIndex()) { pageIndex++; renderBookPages(); }
 });
-
 
 /* ---------- Kliky ---------- */
 zoneTags.addEventListener("click", ()=> { 
@@ -280,62 +257,66 @@ zoneCup.addEventListener("click", ()=> {
 
 bookmark.addEventListener("click", closeBook);
 
+/* ---------- Modal akce ---------- */
+modalConfirm.addEventListener("click", async ()=>{
+  const action = modalConfirm.dataset.action;
+  const charId = localStorage.getItem("ccId");
 
-    /* ---------- Modal akce ---------- */
-    modalConfirm.addEventListener("click", async ()=>{
-      const action = modalConfirm.dataset.action;
-      if (action === "name") {
-        const val = nameInput.value.trim();
-        if (!val) { modalFeedback.textContent = translations[currentLang].name_hint; modalFeedback.style.color="#ff6868"; return; }
+  if (action === "name") {
+    const val = nameInput.value.trim();
+    if (!val) { modalFeedback.textContent = translations[currentLang].name_hint; modalFeedback.style.color="#ff6868"; return; }
 
-        try {
-const res = await api("/api/character/create", {
-  method: "POST",
-  body: JSON.stringify({ name: val })
-});
-const data = await res.json();
-            
-          if (data.error === "exists") {
-            modalFeedback.textContent = translations[currentLang].name_exists; modalFeedback.style.color="#ff6868";
-} else if (data.status === "ok") {
-  modalFeedback.textContent = translations[currentLang].name_success;
-  // Ulož a aplikuj stage 1
-  localStorage.setItem("ccStage", "1");
-  applyStage(1);
+    try {
+      const res = await api("/api/cc/name", {
+        method: "POST",
+        body: JSON.stringify({ charId, name: val })
+      });
+      const data = await res.json();
 
-  // 🔽 Přidané – confirm zneaktivnit
-  modalConfirm.disabled = true;
-  modalConfirm.style.opacity = "0.5";
-} else {
-  modalFeedback.textContent = "Server error.";
-  modalFeedback.style.color = "#ff6868";
-}
-        } catch {
-          modalFeedback.textContent = translations[currentLang].name_error; modalFeedback.style.color="#ff6868";
-        }
+      if (data.error === "NAME_TAKEN") {
+        modalFeedback.textContent = translations[currentLang].name_exists; 
+        modalFeedback.style.color="#ff6868";
+      } else if (data.ok) {
+        modalFeedback.textContent = translations[currentLang].name_success;
+        localStorage.setItem("ccStage", "1");
+        applyStage(1);
+        modalConfirm.disabled = true;
+        modalConfirm.style.opacity = "0.5";
       } else {
-        // leave
-        const res = await api("/api/character/cc-complete", {
-  method: "POST",
-  body: JSON.stringify({})
-});
-        const data = await res.json();
-        if (data.redirect) window.location.href = data.redirect;
+        modalFeedback.textContent = "Server error.";
+        modalFeedback.style.color = "#ff6868";
       }
-    });
-    modalCancel.addEventListener("click", closeModal);
+    } catch {
+      modalFeedback.textContent = translations[currentLang].name_error; 
+      modalFeedback.style.color="#ff6868";
+    }
 
+  } else if (action === "leave") {
+    if (!charId) return;
+    const res = await api("/api/cc/finish", {
+      method: "POST",
+      body: JSON.stringify({ charId })
+    });
+    const data = await res.json();
+    if (data.ok) window.location.href = "/game.html";
+  }
+});
+modalCancel.addEventListener("click", closeModal);
+
+/* ---------- Init CC ---------- */
 (async function initCc(){
   try {
-    const r = await api("/api/character/status");
+    // init (vytvoří nový řádek a vrátí id)
+    const r = await api("/api/cc/init", { method: "POST", body: JSON.stringify({}) });
     const s = await r.json();
-    if (typeof s.cc_stage === "number") {
-      localStorage.setItem("ccStage", String(s.cc_stage));
-      if (s.cc_stage === 1 && s.book_visited) localStorage.setItem("ccBookVisited","true");
-      applyStage(s.cc_stage);
-      return;
+
+    if (s.ok && s.character) {
+      localStorage.setItem("ccId", s.character.id);
+      localStorage.setItem("ccStage", "0");
+      applyStage(0);
+    } else {
+      throw new Error("bad");
     }
-    throw new Error("bad");
   } catch {
     const saved = parseInt(localStorage.getItem("ccStage") || "0", 10);
     applyStage(saved);

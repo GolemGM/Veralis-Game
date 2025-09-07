@@ -264,7 +264,12 @@ modalConfirm.addEventListener("click", async ()=>{
 
   if (action === "name") {
     const val = nameInput.value.trim();
-    if (!val) { modalFeedback.textContent = translations[currentLang].name_hint; modalFeedback.style.color="#ff6868"; return; }
+    if (!val) {
+  modalFeedback.classList.remove("success");
+  modalFeedback.classList.add("error");
+  modalFeedback.textContent = translations[currentLang].name_hint;
+  return;
+}
 
     try {
       const res = await api("/api/cc/name", {
@@ -273,23 +278,30 @@ modalConfirm.addEventListener("click", async ()=>{
       });
       const data = await res.json();
 
-      if (data.error === "NAME_TAKEN") {
-        modalFeedback.textContent = translations[currentLang].name_exists; 
-        modalFeedback.style.color="#ff6868";
-      } else if (data.ok) {
-        modalFeedback.textContent = translations[currentLang].name_success;
-        localStorage.setItem("ccStage", "1");
-        applyStage(1);
-        modalConfirm.disabled = true;
-        modalConfirm.style.opacity = "0.5";
-      } else {
-        modalFeedback.textContent = "Server error.";
-        modalFeedback.style.color = "#ff6868";
-      }
-    } catch {
-      modalFeedback.textContent = translations[currentLang].name_error; 
-      modalFeedback.style.color="#ff6868";
-    }
+if (data.error === "NAME_TAKEN") {
+  modalFeedback.classList.remove("success");
+  modalFeedback.classList.add("error");
+  modalFeedback.textContent = translations[currentLang].name_exists;
+} else if (data.ok) {
+  const extra = translations[currentLang]?.you_can_close || "Můžeš zavřít okno.";
+  modalFeedback.classList.remove("error");
+  modalFeedback.classList.add("success");
+  modalFeedback.textContent = `${translations[currentLang].name_success} ${extra}`;
+
+  localStorage.setItem("ccStage", "1");
+  applyStage(1);
+  modalConfirm.disabled = true;
+  modalConfirm.style.opacity = "0.5";
+} else {
+  modalFeedback.classList.remove("success");
+  modalFeedback.classList.add("error");
+  modalFeedback.textContent = "Server error.";
+}
+ } catch {
+  modalFeedback.classList.remove("success");
+  modalFeedback.classList.add("error");
+  modalFeedback.textContent = translations[currentLang].name_error;
+}
 
   } else if (action === "leave") {
     if (!charId) return;

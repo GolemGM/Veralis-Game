@@ -12,7 +12,7 @@ const translations = {
     leave_confirm: "Odejít",
     leave_cancel:  "Zůstat",
   
-    name_success: "Jméno úspěšně zarezervováno.",
+    name_success: "Jméno úspěšně zarezervováno. Můžeš zavřít okno.",
     name_exists: "Jméno již existuje, zkuste jiné.",
     name_invalid: "Zadejte platné jméno.",
     name_error: "Chyba serveru, zkuste znovu.",
@@ -82,7 +82,7 @@ const translations = {
   leave_confirm: "Leave",
   leave_cancel:  "Stay",
 
-  name_success: "Name successfully reserved.",
+  name_success: "Name successfully reserved. You can close this window.",
   name_exists:  "That name already exists. Try another one.",
   name_invalid: "Please enter a valid name.",
   name_error:   "Server error. Please try again.",

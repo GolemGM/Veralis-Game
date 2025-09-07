@@ -283,10 +283,9 @@ if (data.error === "NAME_TAKEN") {
   modalFeedback.classList.add("error");
   modalFeedback.textContent = translations[currentLang].name_exists;
 } else if (data.ok) {
-  const extra = translations[currentLang]?.you_can_close || "Můžeš zavřít okno.";
   modalFeedback.classList.remove("error");
   modalFeedback.classList.add("success");
-  modalFeedback.textContent = `${translations[currentLang].name_success} ${extra}`;
+  modalFeedback.textContent = translations[currentLang].name_success;
 
   localStorage.setItem("ccStage", "1");
   applyStage(1);

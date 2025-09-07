@@ -30,17 +30,32 @@
       position:absolute; left:50%; top:32%; transform:translateX(-50%);
       width:80%; margin:0; font-size:0.95rem; color:#bfcad0; text-align:center;
     }
-    #name-input {
-      position:absolute; left:50%; top:40%; transform:translateX(-50%);
-      width:64%; height:8%;
-      background:transparent;
-      color:#fff; font-size:1.2rem; text-align:center; outline:none; z-index:2;
-      border: none;
+#name-input {
+  position:absolute; left:50%; top:40%; transform:translateX(-50%);
+  width:64%; height:8%;
+  background:transparent;
+  color:#fff; font-size:1.2rem; text-align:center; outline:none; z-index:2;
+  border: none;
+
+  /* fix autofill */
+  -webkit-box-shadow: 0 0 0px 1000px #000 inset !important;
+  -webkit-text-fill-color: #fff !important;
+}
     }
-    #modal-feedback {
-      position:absolute; left:50%; top:56%; transform:translateX(-50%);
-      width:80%; margin:0; font-size:0.95rem; color:#00ffff; text-align:center;
-    }
+#modal-feedback {
+  position:absolute; left:50%; top:56%; transform:translateX(-50%);
+  width:80%; margin:0; font-size:0.95rem; text-align:center;
+  color:#bfcad0; /* default neutrální */
+}
+
+#modal-feedback.success {
+  color:#4caf50; /* zelená pro úspěch */
+}
+
+#modal-feedback.error {
+  color:#ff4444; /* červená pro chyby */
+}
+
     #modal-confirm, #modal-cancel {
       position:absolute; width:21%; height:8%; background:transparent;
       color:#fff; cursor:pointer; z-index:2;

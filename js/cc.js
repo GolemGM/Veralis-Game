@@ -96,7 +96,7 @@ function applyStage(stage) {
     }
 
   } else if (ccStage >= 2) {
-    window.location.href = "/game.html";
+    window.location.href = "https://golemgm.github.io/Veralis-Game/game.html";
   }
 }
 
@@ -309,7 +309,7 @@ if (data.error === "NAME_TAKEN") {
       body: JSON.stringify({ charId })
     });
     const data = await res.json();
-    if (data.ok) window.location.href = "/game.html";
+    if (data.ok) window.location.href = "https://golemgm.github.io/Veralis-Game/game.html";
   }
 });
 modalCancel.addEventListener("click", closeModal);

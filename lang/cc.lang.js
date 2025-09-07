@@ -2,7 +2,7 @@ const translations = {
   cs: {
     // Modal – jméno
     enter_name: "Zadejte jméno postavy",
-    name_hint: "Písmena, mezery do 30 znaků",
+    name_hint: "Použij 3–30 znaků (písmena a mezery).",
     confirm: "Potvrdit",
     close: "Zavřít",
 
@@ -72,7 +72,7 @@ const translations = {
   en: {
   // Modal – name
   enter_name: "Enter character name",
-  name_hint: "Letters, spaces up to 30 characters",
+  name_hint: "Use 3–30 characters (letters and spaces).",
   confirm: "Confirm",
   close: "Close",
 

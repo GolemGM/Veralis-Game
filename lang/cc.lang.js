@@ -25,7 +25,7 @@ const translations = {
     // --- Zápisník ---
     lore_page1: `
       <h3>Dnešní úkoly</h3>
-      <p>Tady bych nedával zbytečně moc. Hlavní cíl dnešního dne bude
+      <p>Hlavní cíl dnešního dne bude
       zahájení výstavby rozšíření laboratoří o výzkumné křídlo.</p>
       <p>Dodržovat denní rutinu vedenou naším palubním počítačem,
       jsem zvědav, co mi pro dnešek nachystal dalšího.

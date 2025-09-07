@@ -1,91 +1,103 @@
-    /* ---------- Globál ---------- */
-    html, body {
-      margin:0; padding:0; width:100%; height:100%;
-      background:#000; display:flex; justify-content:center; align-items:center;
-      overflow:hidden; font-family:Arial, sans-serif; color:#fff;
-    }
-    .hidden { display:none !important; }
+/* ---------- Globál ---------- */
+html, body {
+  margin:0; padding:0; width:100%; height:100%;
+  background:#000; display:flex; justify-content:center; align-items:center;
+  overflow:hidden; font-family:Arial, sans-serif; color:#fff;
+}
+.hidden { display:none !important; }
 
-    /* Pevné plátno 1600×900 */
-    #cc-root { position:relative; width:1600px; height:900px; background:#000; overflow:hidden; }
+/* Pevné plátno 1600×900 */
+#cc-root { position:relative; width:1600px; height:900px; background:#000; overflow:hidden; }
 
-    /* Scéna – stůl */
-    #cc-table { position:relative; width:100%; height:100%; }
-    #cc-table img { display:block; width:100%; height:100%; } /* bez object-fit */
+/* Scéna – stůl */
+#cc-table { position:relative; width:100%; height:100%; }
+#cc-table img { display:block; width:100%; height:100%; } /* bez object-fit */
 
-    /* Rozmazání pozadí při modalu/knihy */
-    .blurred #cc-table img { filter:blur(8px) brightness(0.6); }
+/* Rozmazání pozadí při modalu/knihy */
+.blurred #cc-table img { filter:blur(8px) brightness(0.6); }
 
-    /* ---------- Modal (cc_modal.png, 800×600) ---------- */
-    #cc-modal { position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); width:800px; height:600px; z-index:1000; }
-    #cc-modal img.cc-modal-frame { position:absolute; inset:0; width:100%; height:100%; }
-    .cc-modal-content { position:absolute; inset:0; width:100%; height:100%; color:#fff; }
+/* ---------- Modal (cc_modal.png, 800×600) ---------- */
+#cc-modal { position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); width:800px; height:600px; z-index:1000; }
+#cc-modal img.cc-modal-frame { position:absolute; inset:0; width:100%; height:100%; }
+.cc-modal-content { position:absolute; inset:0; width:100%; height:100%; color:#fff; }
 
-    /* souřadnice v % z rozměru 800×600 */
-    .cc-modal-content h2 {
-      position:absolute; left:50%; top:24%; transform:translateX(-50%);
-      margin:0; font-size:1.7rem; text-align:center;
-    }
-    #modal-instructions {
-      position:absolute; left:50%; top:32%; transform:translateX(-50%);
-      width:80%; margin:0; font-size:0.95rem; color:#bfcad0; text-align:center;
-    }
-#name-input {
+/* souřadnice v % z rozměru 800×600 */
+.cc-modal-content h2 {
+  position:absolute; left:50%; top:24%; transform:translateX(-50%);
+  margin:0; font-size:1.7rem; text-align:center;
+}
+#modal-instructions {
+  position:absolute; left:50%; top:32%; transform:translateX(-50%);
+  width:80%; margin:0; font-size:0.95rem; color:#bfcad0; text-align:center;
+}
+
+/* --- CC: input v modalu (sloučené + autofill fix) --- */
+#name-input.cc-input {
   position:absolute; left:50%; top:40%; transform:translateX(-50%);
   width:64%; height:8%;
   background:transparent;
   color:#fff; font-size:1.2rem; text-align:center; outline:none; z-index:2;
   border: none;
 
-  /* fix autofill */
+  /* fix autofill (Chromium) */
   -webkit-box-shadow: 0 0 0px 1000px #000 inset !important;
   -webkit-text-fill-color: #fff !important;
 }
-    }
-#modal-feedback {
-  position:absolute; left:50%; top:56%; transform:translateX(-50%);
+/* Potlačí bílé podbarvení prohlížeče při automatickém doplnění */
+#name-input.cc-input:-webkit-autofill,
+#name-input.cc-input:-webkit-autofill:hover,
+#name-input.cc-input:-webkit-autofill:focus {
+  -webkit-text-fill-color: #fff;
+  box-shadow: 0 0 0px 1000px transparent inset;
+  transition: background-color 99999s ease-in-out 0s;
+}
+/* Pro jistotu i u ostatních engine */
+#name-input.cc-input:autofill {
+  background: transparent !important;
+  color: #fff !important;
+}
+
+/* --- Modal feedback --- */
+#modal-feedback{
+  position:absolute; left:50%; top:52%; transform:translateX(-50%);
   width:80%; margin:0; font-size:0.95rem; text-align:center;
-  color:#bfcad0; /* default neutrální */
+  color:#cfe8ff; /* neutrální výchozí */
 }
+/* barvy stavu (JS přidává class .success / .error) */
+#modal-feedback.success{ color:#27d17f; }  /* zelená */
+#modal-feedback.error  { color:#ff6868; }  /* červená */
 
-#modal-feedback.success {
-  color:#4caf50; /* zelená pro úspěch */
+#modal-confirm, #modal-cancel {
+  position:absolute; width:21%; height:8%; background:transparent;
+  color:#fff; cursor:pointer; z-index:2;
+  border: none;
 }
+#modal-confirm { top:64.5%; left:25%; }
+#modal-cancel  { top:64.5%; left:54.5%; }
+#modal-confirm:hover, #modal-cancel:hover { color:#0ff; text-shadow:0 0 8px #0ff; }
+#modal-confirm:active, #modal-cancel:active { transform:scale(0.98); color:#08f; }
 
-#modal-feedback.error {
-  color:#ff4444; /* červená pro chyby */
-}
+/* ---------- Kniha (cc_notebook.png) ---------- */
+#cc-book { position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); width:1300px; height:800px; z-index:1100; }
+#cc-book img { position:absolute; inset:0; width:100%; height:100%; pointer-events:none; }
 
-    #modal-confirm, #modal-cancel {
-      position:absolute; width:21%; height:8%; background:transparent;
-      color:#fff; cursor:pointer; z-index:2;
-      border: none;
-    }
-    #modal-confirm { top:64.5%; left:25%; }
-    #modal-cancel  { top:64.5%; left:54.5%; }
-    #modal-confirm:hover, #modal-cancel:hover { color:#0ff; text-shadow:0 0 8px #0ff; }
-    #modal-confirm:active, #modal-cancel:active { transform:scale(0.98); color:#08f; }
-
-    /* ---------- Kniha (cc_notebook.png) ---------- */
-    #cc-book { position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); width:1300px; height:800px; z-index:1100; }
-    #cc-book img { position:absolute; inset:0; width:100%; height:100%; pointer-events:none; }
-    /* Textové plochy a klik zóny pro obrázek 1300×800 uvnitř #cc-book */
+/* Textové plochy a klik zóny pro obrázek 1300×800 uvnitř #cc-book */
 #cc-book .cc-page{
   position:absolute; z-index:2; overflow:auto;
   padding:0.6em 0.9em; color:#232323; line-height:1.45;
 }
 /* levá/pravá plocha textu (doladíš dle potřeby) */
 #cc-book .cc-left  { 
-  top: 11.5%;   /* ← UPRAVUJ (svislá pozice textu na levé stránce) */
-  left: 18%;   /* ← UPRAVUJ (vodorovná pozice) */
-  width: 22%; /* ← UPRAVUJ (šířka textového pole) */
-  height: 58%;  /* ← UPRAVUJ (výška textového pole) */
+  top: 11.5%;
+  left: 18%;
+  width: 22%;
+  height: 58%;
 }
 #cc-book .cc-right { 
-  top: 11.5%;   /* ← UPRAVUJ (svislá pozice textu na levé stránce) */
-  right: 19.4%;   /* ← UPRAVUJ (vodorovná pozice) */
-  width: 22%; /* ← UPRAVUJ (šířka textového pole) */
-  height: 58%;  /* ← UPRAVUJ (výška textového pole) */
+  top: 11.5%;
+  right: 19.4%;
+  width: 22%;
+  height: 58%;
 }
 
 /* klikací trojúhelníky – spodní rohy stránek */
@@ -113,10 +125,7 @@
 
 /* lehká vizuální reakce myší (volitelné) */
 /* nastav barvu „nasvícení“ jen pro notebook */
-#cc-book {
-  /* MĚŇ TADY: barva glow jen když je kniha otevřená */
-  --book-glow: rgba(233, 217, 186, 0.678); /* např. teplá amber */
-}
+#cc-book { --book-glow: rgba(233, 217, 186, 0.678); }
 
 /* hover efekt používá proměnnou */
 #book-zones .zone:hover, #bookmark:hover {
@@ -135,9 +144,9 @@
 
 /* instrukce zarovnané do „input slotu“ v leave modalu */
 #modal-instructions.in-slot {
-  top: 43%;              /* jemně dolaď dle oka (42–44 %) */
+  top: 43%;
   width: 70%;
-  color: #cfe8ff;        /* lehce světlejší, ať je čitelné na tmavém panelu */
+  color: #cfe8ff;
   font-size: 1rem;
 }
 
@@ -147,28 +156,3 @@
 
 /* volitelně: vlastní barva highlightu jen pro knihu */
 #cc-book .highlight { fill: rgba(255,220,0,.22); stroke: rgba(255,220,0,.85); }
-
-/* --- CC: input v modalu --- */
-#name-input.cc-input {
-  background: transparent;
-  color: #fff;
-}
-
-/* Potlačí bílé podbarvení prohlížeče při automatickém doplnění */
-#name-input.cc-input:-webkit-autofill,
-#name-input.cc-input:-webkit-autofill:hover,
-#name-input.cc-input:-webkit-autofill:focus {
-  -webkit-text-fill-color: #fff;
-  box-shadow: 0 0 0px 1000px transparent inset;
-  transition: background-color 99999s ease-in-out 0s;
-}
-
-/* Pro jistotu i u ostatních engine */
-#name-input.cc-input:autofill {
-  background: transparent !important;
-  color: #fff !important;
-}
-
-/* Neutrální default barva feedbacku (barvu mění JS) */
-#modal-feedback { color: #cfe8ff; }
-

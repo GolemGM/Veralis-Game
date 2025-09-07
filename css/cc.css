@@ -147,3 +147,28 @@
 
 /* volitelně: vlastní barva highlightu jen pro knihu */
 #cc-book .highlight { fill: rgba(255,220,0,.22); stroke: rgba(255,220,0,.85); }
+
+/* --- CC: input v modalu --- */
+#name-input.cc-input {
+  background: transparent;
+  color: #fff;
+}
+
+/* Potlačí bílé podbarvení prohlížeče při automatickém doplnění */
+#name-input.cc-input:-webkit-autofill,
+#name-input.cc-input:-webkit-autofill:hover,
+#name-input.cc-input:-webkit-autofill:focus {
+  -webkit-text-fill-color: #fff;
+  box-shadow: 0 0 0px 1000px transparent inset;
+  transition: background-color 99999s ease-in-out 0s;
+}
+
+/* Pro jistotu i u ostatních engine */
+#name-input.cc-input:autofill {
+  background: transparent !important;
+  color: #fff !important;
+}
+
+/* Neutrální default barva feedbacku (barvu mění JS) */
+#modal-feedback { color: #cfe8ff; }
+
